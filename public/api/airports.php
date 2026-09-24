@@ -62,7 +62,7 @@ curl_setopt_array($curl, [
     CURLOPT_TIMEOUT => 6,
     CURLOPT_FOLLOWLOCATION => false,
     CURLOPT_HTTPHEADER => ['Accept: application/json'],
-    CURLOPT_USERAGENT => 'PrivateJetExecutive.com airport search/1.0',
+    CURLOPT_USERAGENT => 'Private Jet Executive airport search/1.0',
 ]);
 
 $body = curl_exec($curl);
