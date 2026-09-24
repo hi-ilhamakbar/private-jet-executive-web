@@ -31,7 +31,7 @@ document.querySelectorAll('[data-count-target]').forEach((input) => {
 });
 
 const returnFields = document.querySelectorAll('[data-return-field]');
-const returnInputs = document.querySelectorAll('[data-return-field] input');
+const returnInputs = document.querySelectorAll('[data-return-field] input, [data-return-field] [data-time-trigger]');
 const departureDate = document.getElementById('departure_date');
 const returnDate = document.getElementById('return_date');
 const setJourneyType = () => {
@@ -117,6 +117,67 @@ document.querySelectorAll('[data-country-picker]').forEach((select) => {
   document.addEventListener('click', (event) => {
     if (!wrapper.contains(event.target)) { list.hidden = true; button.setAttribute('aria-expanded', 'false'); }
   });
+});
+
+document.querySelectorAll('[data-time-picker]').forEach((picker) => {
+  const valueInput = picker.querySelector('[data-time-value]');
+  const trigger = picker.querySelector('[data-time-trigger]');
+  const panel = picker.querySelector('[data-time-panel]');
+  const hours = picker.querySelector('[data-time-hours]');
+  const minutes = picker.querySelector('[data-time-minutes]');
+  let [selectedHour, selectedMinute] = valueInput.value ? valueInput.value.split(':').map(Number) : [null, null];
+
+  const update = () => {
+    trigger.textContent = selectedHour === null || selectedMinute === null
+      ? 'Select a time'
+      : `${String(selectedHour).padStart(2, '0')}:${String(selectedMinute).padStart(2, '0')}`;
+    valueInput.value = selectedHour === null || selectedMinute === null
+      ? ''
+      : `${String(selectedHour).padStart(2, '0')}:${String(selectedMinute).padStart(2, '0')}`;
+    [...hours.children].forEach((button) => button.classList.toggle('time-picker__choice--active', Number(button.value) === selectedHour));
+    [...minutes.children].forEach((button) => button.classList.toggle('time-picker__choice--active', Number(button.value) === selectedMinute));
+  };
+  const choose = (kind, value) => {
+    if (kind === 'hour') selectedHour = value;
+    else selectedMinute = value;
+    update();
+    if (selectedHour !== null && selectedMinute !== null && kind === 'minute') {
+      panel.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+      trigger.focus();
+    }
+  };
+  for (let hour = 0; hour < 24; hour += 1) {
+    const choice = document.createElement('button');
+    choice.type = 'button';
+    choice.value = String(hour);
+    choice.className = 'time-picker__choice';
+    choice.textContent = String(hour).padStart(2, '0');
+    choice.addEventListener('click', () => choose('hour', hour));
+    hours.append(choice);
+  }
+  for (let minute = 0; minute < 60; minute += 5) {
+    const choice = document.createElement('button');
+    choice.type = 'button';
+    choice.value = String(minute);
+    choice.className = 'time-picker__choice';
+    choice.textContent = String(minute).padStart(2, '0');
+    choice.addEventListener('click', () => choose('minute', minute));
+    minutes.append(choice);
+  }
+  trigger.addEventListener('click', () => {
+    const opening = panel.hidden;
+    document.querySelectorAll('[data-time-panel]').forEach((element) => element.hidden = true);
+    panel.hidden = !opening;
+    trigger.setAttribute('aria-expanded', String(opening));
+  });
+  document.addEventListener('click', (event) => {
+    if (!picker.contains(event.target)) { panel.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+  });
+  trigger.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') { panel.hidden = true; trigger.setAttribute('aria-expanded', 'false'); }
+  });
+  update();
 });
 
 document.querySelectorAll('[data-airport-search]').forEach((input) => {
