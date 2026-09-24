@@ -6,6 +6,13 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    http_response_code(405);
+    header('Allow: GET');
+    echo json_encode(['error' => 'Method not allowed.']);
+    exit;
+}
+
 $query = trim((string) ($_GET['q'] ?? ''));
 
 if (mb_strlen($query) < 2 || mb_strlen($query) > 80 || !preg_match('/^[\p{L}\p{N}\s,\.\-()]+$/u', $query)) {
@@ -17,6 +24,13 @@ if (mb_strlen($query) < 2 || mb_strlen($query) > 80 || !preg_match('/^[\p{L}\p{N
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_name('pje_session');
     session_start();
+}
+
+$cacheKey = mb_strtolower($query);
+$cache = $_SESSION['airport_search_cache'][$cacheKey] ?? null;
+if (is_array($cache) && isset($cache['expires'], $cache['payload']) && is_int($cache['expires']) && $cache['expires'] >= time() && is_array($cache['payload'])) {
+    echo json_encode($cache['payload'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
 }
 
 $now = time();
@@ -69,6 +83,15 @@ if (!is_array($decoded)) {
     http_response_code(502);
     echo json_encode(['error' => 'Airport search returned an unexpected response.']);
     exit;
+}
+
+$_SESSION['airport_search_cache'][$cacheKey] = [
+    'expires' => time() + 300,
+    'payload' => $decoded,
+];
+
+if (count($_SESSION['airport_search_cache']) > 30) {
+    $_SESSION['airport_search_cache'] = array_slice($_SESSION['airport_search_cache'], -30, null, true);
 }
 
 echo json_encode($decoded, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

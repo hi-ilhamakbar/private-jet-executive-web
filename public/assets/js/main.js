@@ -187,16 +187,32 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
   let activeIndex = -1;
   let controller;
   let timer;
+  let requestId = 0;
 
   const resultLabel = (item) => {
-    const city = item.city?.name || item.city_name || item.city || item.location?.city || '';
-    const name = item.name || item.airport_name || item.title || '';
-    const code = item.iata || item.iata_code || item.code || item.airport_code || '';
-    const country = item.country?.name || item.country_name || item.country || '';
+    const city = String(item.city?.name || item.city_name || item.city || item.location?.city || '').trim();
+    const name = String(item.name || item.airport_name || item.title || '').trim();
+    const code = String(item.iata || item.iata_code || item.code || item.airport_code || '').trim().toUpperCase();
+    const country = String(item.country?.name || item.country_name || item.country || '').trim();
     const location = city || name;
-    const airport = name && name !== location ? ` — ${name}` : '';
+    const airport = name && name.toLocaleLowerCase() !== location.toLocaleLowerCase() ? ` — ${name}` : '';
     const identifier = code ? ` (${code})` : '';
     return `${location}${identifier}${airport}${country ? ` — ${country}` : ''}`;
+  };
+  const normaliseResults = (list) => {
+    const seen = new Set();
+
+    return list.reduce((normalised, item) => {
+      if (!item || typeof item !== 'object') return normalised;
+      const label = resultLabel(item).replace(/\s+/g, ' ').trim();
+      const code = String(item.iata || item.iata_code || item.code || item.airport_code || '').trim().toUpperCase();
+      const key = (code || label).toLocaleLowerCase();
+
+      if (!label || seen.has(key) || normalised.length >= 8) return normalised;
+      seen.add(key);
+      normalised.push(item);
+      return normalised;
+    }, []);
   };
   const closeResults = () => {
     items = [];
@@ -204,6 +220,8 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
     results.hidden = true;
     results.replaceChildren();
     input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+    input.setAttribute('aria-busy', 'false');
   };
   const selectItem = (item) => {
     input.value = resultLabel(item);
@@ -225,34 +243,45 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
       option.type = 'button';
       option.className = 'airport-option';
       option.setAttribute('role', 'option');
+      option.setAttribute('aria-selected', 'false');
       option.id = `${input.id}-option-${index}`;
       option.textContent = resultLabel(item) || 'Airport result';
       option.addEventListener('mousedown', (event) => { event.preventDefault(); selectItem(item); });
       results.append(option);
     });
     results.hidden = false;
-    status.textContent = `${items.length} matching locations available.`;
+    status.textContent = '';
     input.setAttribute('aria-expanded', 'true');
   };
   const setActive = (index) => {
     activeIndex = index;
-    [...results.children].forEach((element, itemIndex) => element.classList.toggle('airport-option--active', itemIndex === activeIndex));
-    input.setAttribute('aria-activedescendant', activeIndex >= 0 ? `${input.id}-option-${activeIndex}` : '');
+    [...results.children].forEach((element, itemIndex) => {
+      const isActive = itemIndex === activeIndex;
+      element.classList.toggle('airport-option--active', isActive);
+      element.setAttribute('aria-selected', String(isActive));
+      if (isActive) element.scrollIntoView({ block: 'nearest' });
+    });
+    if (activeIndex >= 0) input.setAttribute('aria-activedescendant', `${input.id}-option-${activeIndex}`);
+    else input.removeAttribute('aria-activedescendant');
   };
   const search = async () => {
     const query = input.value.trim();
     if (query.length < 2) { closeResults(); status.textContent = query ? 'Enter at least two characters.' : ''; return; }
     controller?.abort();
     controller = new AbortController();
+    const currentRequest = ++requestId;
+    input.setAttribute('aria-busy', 'true');
     status.textContent = 'Searching airports…';
     try {
       const response = await fetch(`/api/airports.php?q=${encodeURIComponent(query)}`, { signal: controller.signal, headers: { Accept: 'application/json' } });
       if (!response.ok) throw new Error('Search request failed');
       const payload = await response.json();
       const list = Array.isArray(payload) ? payload : payload.data || payload.regions || payload.items || payload.results || [];
-      render(Array.isArray(list) ? list : []);
+      if (currentRequest === requestId) render(Array.isArray(list) ? normaliseResults(list) : []);
     } catch (error) {
-      if (error.name !== 'AbortError') { closeResults(); status.textContent = 'Airport search is temporarily unavailable. Please enter the location manually.'; }
+      if (error.name !== 'AbortError' && currentRequest === requestId) { closeResults(); status.textContent = 'Airport search is temporarily unavailable. Please enter the location manually.'; }
+    } finally {
+      if (currentRequest === requestId) input.setAttribute('aria-busy', 'false');
     }
   };
   input.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 320); });
@@ -260,6 +289,8 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
     if (!items.length) { if (event.key === 'Escape') closeResults(); return; }
     if (event.key === 'ArrowDown') { event.preventDefault(); setActive(Math.min(activeIndex + 1, items.length - 1)); }
     if (event.key === 'ArrowUp') { event.preventDefault(); setActive(Math.max(activeIndex - 1, 0)); }
+    if (event.key === 'Home') { event.preventDefault(); setActive(0); }
+    if (event.key === 'End') { event.preventDefault(); setActive(items.length - 1); }
     if (event.key === 'Enter' && activeIndex >= 0) { event.preventDefault(); selectItem(items[activeIndex]); }
     if (event.key === 'Escape') { event.preventDefault(); closeResults(); }
   });
