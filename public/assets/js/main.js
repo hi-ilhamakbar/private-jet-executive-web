@@ -235,7 +235,7 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
       results.append(option);
     });
     results.hidden = false;
-    status.textContent = `${items.length} matching locations available.`;
+    status.textContent = '';
     input.setAttribute('aria-expanded', 'true');
   };
   const setActive = (index) => {
