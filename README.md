@@ -89,6 +89,6 @@ The protected invoice workspace is available at `/admin/invoices`. Set `ADMIN_US
 php -r "echo password_hash('choose-a-strong-password', PASSWORD_DEFAULT), PHP_EOL;"
 ```
 
-Create a MySQL or MariaDB database and database user in cPanel, then place `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in the same secret `.env`. Import `database/migrations/001_create_invoices.sql` through phpMyAdmin before using the workspace. The migration enforces invoice-number uniqueness.
+Create a MySQL or MariaDB database and database user in cPanel, then place `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in the same secret `.env`. Import `database/migrations/001_create_invoices.sql` through phpMyAdmin before using the workspace. If the first migration was already imported, apply `database/migrations/002_add_invoice_due_at.sql` once. The migration enforces invoice-number uniqueness.
 
-Invoices use Asia/Jakarta for their generated date and follow `#INV/YYMMDD/EEEEE`. The final five digits are epoch-derived; insertion occurs under a unique database key and retries a collision before a PDF is produced. Monetary values are stored as integer USD cents. PDFs are generated server-side with Dompdf and downloaded directly to the authenticated administrator.
+Invoices use Asia/Jakarta for their generated date and follow `#INV/YYMMDD/EEEEE`. The final five digits are epoch-derived; insertion occurs under a unique database key and retries a collision before a PDF is produced. Payment is due within 24 hours, except invoices issued on Friday are due on Monday at the same local time. Monetary values are stored as integer USD cents. PDFs are generated server-side with Dompdf and downloaded directly to the authenticated administrator.

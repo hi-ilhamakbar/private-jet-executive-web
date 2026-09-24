@@ -14,6 +14,7 @@ final class InvoiceService
     public function create(array $values): array
     {
         $generatedAt = new \DateTimeImmutable('now', new \DateTimeZone('Asia/Jakarta'));
+        $dueAt = self::dueAt($generatedAt);
         $datePrefix = $generatedAt->format('ymd');
         $epochSeed = time() % 100000;
 
@@ -23,12 +24,19 @@ final class InvoiceService
             if ($this->repository->exists($number)) continue;
 
             try {
-                return $this->repository->create($number, $values, $generatedAt);
+                return $this->repository->create($number, $values, $generatedAt, $dueAt);
             } catch (\PDOException $exception) {
                 if ($exception->getCode() !== '23000') throw $exception;
             }
         }
 
         throw new \RuntimeException('Unable to allocate a unique invoice number.');
+    }
+
+    public static function dueAt(\DateTimeImmutable $generatedAt): \DateTimeImmutable
+    {
+        return $generatedAt->format('N') === '5'
+            ? $generatedAt->modify('+3 days')
+            : $generatedAt->modify('+1 day');
     }
 }

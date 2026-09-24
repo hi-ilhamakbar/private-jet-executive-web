@@ -20,10 +20,10 @@ final class InvoiceRepository
     /** @param array<string, string> $values
      * @return array<string, mixed>
      */
-    public function create(string $number, array $values, \DateTimeImmutable $generatedAt): array
+    public function create(string $number, array $values, \DateTimeImmutable $generatedAt, \DateTimeImmutable $dueAt): array
     {
         $statement = $this->database->prepare(
-            'INSERT INTO invoices (invoice_number, journey_type, route, outbound_at, return_at, aircraft_type, capacity, additional_request, total_usd_cents, generated_at) VALUES (:invoice_number, :journey_type, :route, :outbound_at, :return_at, :aircraft_type, :capacity, :additional_request, :total_usd_cents, :generated_at)'
+            'INSERT INTO invoices (invoice_number, journey_type, route, outbound_at, return_at, aircraft_type, capacity, additional_request, total_usd_cents, generated_at, due_at) VALUES (:invoice_number, :journey_type, :route, :outbound_at, :return_at, :aircraft_type, :capacity, :additional_request, :total_usd_cents, :generated_at, :due_at)'
         );
         $statement->execute([
             'invoice_number' => $number,
@@ -36,6 +36,7 @@ final class InvoiceRepository
             'additional_request' => $values['additional_request'] !== '' ? $values['additional_request'] : null,
             'total_usd_cents' => (int) $values['total_cents'],
             'generated_at' => $generatedAt->format('Y-m-d H:i:s'),
+            'due_at' => $dueAt->format('Y-m-d H:i:s'),
         ]);
         return $this->find($number) ?? throw new \RuntimeException('Invoice record could not be read.');
     }
