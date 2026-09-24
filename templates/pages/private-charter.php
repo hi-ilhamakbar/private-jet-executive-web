@@ -28,8 +28,6 @@ $today = date('Y-m-d');
     </div></div>
 </section>
 
-<section class="section section--charcoal"><div class="container centered-copy"><p class="eyebrow">Start a conversation</p><h2>Tell us where you need to be.</h2><p>Share the essentials of your proposed journey and our team will review the available options with you.</p></div></section>
-
 <section class="section section--pearl">
     <div class="container form-shell">
         <div class="form-shell__heading"><p class="eyebrow eyebrow--dark">Request a charter</p><h2>Plan your journey.</h2><p>Share the essential details below. This is an enquiry, not an aircraft or price confirmation.</p></div>
