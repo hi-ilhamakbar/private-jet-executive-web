@@ -1,0 +1,13 @@
+---
+# Deploy only the web-accessible files. Application code remains in the
+# repository outside public_html and is resolved through runtime-config.php.
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/chee7661/public_html/privatejetexecutive.com
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp public/index.php $DEPLOYPATH/index.php
+    - /bin/cp public/.htaccess $DEPLOYPATH/.htaccess
+    - /bin/cp public/robots.txt $DEPLOYPATH/robots.txt
+    - /bin/cp public/sitemap.xml $DEPLOYPATH/sitemap.xml
+    - /bin/cp public/runtime-config.example.php $DEPLOYPATH/runtime-config.example.php
+    - /bin/cp -R public/assets $DEPLOYPATH/
