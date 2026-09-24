@@ -8,6 +8,7 @@ final class InquiryForms
 {
     private const RATE_LIMIT_WINDOW = 600;
     private const RATE_LIMIT_MAX_ATTEMPTS = 5;
+    private const CAPTCHA_VERSION = 2;
 
     public static function startSession(): void
     {
@@ -43,7 +44,7 @@ final class InquiryForms
         self::startSession();
         $challenge = $_SESSION['captcha'][$form] ?? null;
 
-        if (!is_array($challenge)) {
+        if (!is_array($challenge) || ($challenge['version'] ?? null) !== self::CAPTCHA_VERSION) {
             $challenge = self::newChallenge();
             $_SESSION['captcha'][$form] = $challenge;
         }
@@ -252,7 +253,7 @@ final class InquiryForms
     {
         $challenge = $_SESSION['captcha'][$form] ?? null;
 
-        if (!is_array($challenge) || !isset($challenge['answer']) || !preg_match('/^[0-9]{1,3}$/', trim($answer))
+        if (!is_array($challenge) || ($challenge['version'] ?? null) !== self::CAPTCHA_VERSION || !isset($challenge['answer']) || !preg_match('/^[0-9]{1,3}$/', trim($answer))
             || !hash_equals((string) $challenge['answer'], trim($answer))) {
             return ['captcha_answer' => 'Please solve the verification question.'];
         }
@@ -282,7 +283,7 @@ final class InquiryForms
         $_SESSION['captcha'][$form] = self::newChallenge();
     }
 
-    /** @return array{question: string, answer: int} */
+    /** @return array{version: int, question: string, answer: int} */
     private static function newChallenge(): array
     {
         // Keep the challenge effortless for genuine visitors: one-digit arithmetic only.
@@ -294,6 +295,7 @@ final class InquiryForms
         $right = $addition ? random_int(1, 9) : random_int(1, $left);
 
         return [
+            'version' => self::CAPTCHA_VERSION,
             'question' => $left . ($addition ? ' + ' : ' − ') . $right . ' = ?',
             'answer' => $addition ? $left + $right : $left - $right,
         ];
