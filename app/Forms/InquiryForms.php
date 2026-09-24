@@ -285,13 +285,13 @@ final class InquiryForms
     /** @return array{question: string, answer: int} */
     private static function newChallenge(): array
     {
-        $left = random_int(10, 99);
-        $right = random_int(1, 99);
+        // Keep the challenge effortless for genuine visitors: one-digit arithmetic only.
+        $left = random_int(1, 9);
         $addition = random_int(0, 1) === 1;
 
-        if (!$addition && $right > $left) {
-            [$left, $right] = [$right, $left];
-        }
+        // For subtraction, choose the second number from the first number's range
+        // so the expected result can never be negative.
+        $right = $addition ? random_int(1, 9) : random_int(1, $left);
 
         return [
             'question' => $left . ($addition ? ' + ' : ' − ') . $right . ' = ?',
