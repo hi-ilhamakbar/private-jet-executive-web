@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$siteName = 'PrivateJetExecutive.com';
+$siteName = 'Private Jet Executive';
 $pageTitle = $pageTitle ?? $siteName;
 $metaDescription = $metaDescription ?? 'Private charter solutions from Indonesia to destinations worldwide.';
 $canonicalPath = $canonicalPath ?? '/';

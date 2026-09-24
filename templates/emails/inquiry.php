@@ -24,7 +24,7 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
         </table>
         <p style="margin:24px 0 0;color:#505156;font-size:12px;line-height:1.6;"><?= $escape($disclaimer) ?></p>
       </td></tr>
-      <tr><td style="padding:22px 36px;background:#0a0f1c;color:#eadcc8;font-size:12px;line-height:1.6;">PrivateJetExecutive.com<br>Ruko Jl. Pandanaran No. 1C Kav. 9, Pekunden, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah - Indonesia 50134<br><a href="mailto:charter@privatejetexecutive.com" style="color:#d4af7c;text-decoration:none;">charter@privatejetexecutive.com</a></td></tr>
+      <tr><td style="padding:22px 36px;background:#0a0f1c;color:#eadcc8;font-size:12px;line-height:1.6;">Private Jet Executive<br>Ruko Jl. Pandanaran No. 1C Kav. 9, Pekunden, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah - Indonesia 50134<br><a href="mailto:charter@privatejetexecutive.com" style="color:#d4af7c;text-decoration:none;">charter@privatejetexecutive.com</a></td></tr>
     </table>
   </td></tr></table>
 </body>

@@ -1,6 +1,6 @@
-# PrivateJetExecutive.com
+# Private Jet Executive
 
-A lightweight, server-rendered PHP foundation for PrivateJetExecutive.com. It is designed for conventional PHP/cPanel hosting and keeps application code separate from the public web root.
+A lightweight, server-rendered PHP foundation for Private Jet Executive. It is designed for conventional PHP/cPanel hosting and keeps application code separate from the public web root.
 
 ## Foundation included
 
