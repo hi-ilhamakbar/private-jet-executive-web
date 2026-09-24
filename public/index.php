@@ -70,10 +70,11 @@ header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style
 
 $router = new Router([
     '/' => 'home',
-    '/private-charter' => 'coming-soon',
-    '/services' => 'coming-soon',
-    '/destinations' => 'coming-soon',
-    '/about' => 'coming-soon',
+    '/private-charter' => 'private-charter',
+    '/services' => 'services',
+    '/service' => 'services',
+    '/destinations' => 'destinations',
+    '/about' => 'about',
     '/contact' => 'coming-soon',
 ]);
 
@@ -94,6 +95,26 @@ $pageData = match ($page) {
         'pageTitle' => 'Page Not Found',
         'metaDescription' => 'The requested page could not be found.',
         'canonicalPath' => $path,
+    ],
+    'private-charter' => [
+        'pageTitle' => 'Private Charter',
+        'metaDescription' => 'Tailored private aircraft charter solutions from Indonesia to destinations worldwide.',
+        'canonicalPath' => '/private-charter',
+    ],
+    'services' => [
+        'pageTitle' => 'Aviation Services',
+        'metaDescription' => 'Private charter solutions for leisure, corporate, group, medical and specialised travel requirements.',
+        'canonicalPath' => '/services',
+    ],
+    'destinations' => [
+        'pageTitle' => 'Global Destinations',
+        'metaDescription' => 'Private charter solutions connecting Indonesia with destinations across the world.',
+        'canonicalPath' => '/destinations',
+    ],
+    'about' => [
+        'pageTitle' => 'About Us',
+        'metaDescription' => 'An Indonesia-based private aviation service with a global outlook and personal approach.',
+        'canonicalPath' => '/about',
     ],
     default => [
         'pageTitle' => 'PrivateJetExecutive.com',
