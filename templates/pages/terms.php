@@ -1,0 +1,13 @@
+<section class="page-hero"><div class="container page-hero__content"><p class="eyebrow">Terms of use</p><h1>Clear terms, considered service.</h1><p class="lead">Please read these terms before using the Private Jet Executive website or submitting an enquiry.</p></div></section>
+
+<section class="section section--pearl"><article class="container legal-copy">
+    <p class="legal-updated">Last updated: 25 September 2026</p>
+    <p>These Terms of Use govern your access to this website and any enquiry submitted through it. By using the website, you agree to these terms. If you do not agree, please do not use the website.</p>
+    <h2>Website information</h2><p>We aim to keep website content accurate and current, but it is provided for general information only. Aircraft imagery, routes and service descriptions are illustrative and do not constitute an offer, representation of aircraft ownership, or guarantee of availability.</p>
+    <h2>Enquiries are not bookings</h2><p>A charter enquiry, acknowledgement email or reference number is not a booking, quotation, aircraft allocation, payment confirmation or contract for carriage. Any arrangement is subject to availability, operator acceptance, pricing, operational requirements, applicable laws and written confirmation.</p>
+    <h2>Appropriate use</h2><p>You must use this website lawfully and must not attempt to interfere with its operation, submit false or misleading information, bypass security controls, scrape content, or use the site in a way that could harm Private Jet Executive or other users.</p>
+    <h2>Intellectual property</h2><p>The website design, text, branding and other content are owned by or licensed to Private Jet Executive and may not be copied, altered, distributed or used commercially without prior written permission, except as permitted by law.</p>
+    <h2>Third-party services</h2><p>The website may rely on third-party services, including communications, hosting and airport search providers. We are not responsible for third-party content, availability or privacy practices.</p>
+    <h2>Liability and governing law</h2><p>To the extent permitted by applicable law, Private Jet Executive is not liable for indirect, incidental or consequential loss arising from use of this website or reliance on its general information. These terms are governed by the applicable laws of Indonesia, subject to any mandatory rights that apply to you.</p>
+    <h2>Contact</h2><p>For questions about these terms, contact <a href="mailto:charter@privatejetexecutive.com">charter@privatejetexecutive.com</a>.</p>
+</article></section>

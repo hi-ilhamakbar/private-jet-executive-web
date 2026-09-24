@@ -8,6 +8,7 @@ $metaDescription = $metaDescription ?? 'Private charter solutions from Indonesia
 $canonicalPath = $canonicalPath ?? '/';
 $appUrl = rtrim((string) (getenv('APP_URL') ?: 'https://privatejetexecutive.com'), '/');
 $canonicalUrl = $appUrl . ($canonicalPath === '/' ? '/' : $canonicalPath);
+$structuredData = \App\Core\StructuredData::forPage($appUrl, $canonicalUrl, $canonicalPath, $pageTitle, $metaDescription);
 ?>
 <!doctype html>
 <html lang="en">
@@ -24,6 +25,7 @@ $canonicalUrl = $appUrl . ($canonicalPath === '/' ? '/' : $canonicalPath);
     <meta property="og:description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
     <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
     <meta name="twitter:card" content="summary">
+    <script type="application/ld+json"><?= json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?> | <?= $siteName ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

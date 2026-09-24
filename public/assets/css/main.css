@@ -75,6 +75,14 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 .section--pearl { color: var(--charcoal); background: var(--pearl); }
 .grid-two { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1fr); gap: clamp(2.5rem, 8vw, 10rem); align-items: start; }
 .prose p { margin: 0 0 1.2rem; max-width: 42rem; font-size: 1.05rem; }
+.legal-copy { max-width: 54rem; }
+.legal-copy h2 { max-width: none; margin: 3.25rem 0 1rem; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+.legal-copy h3 { margin: 2rem 0 .7rem; font-size: 1.35rem; }
+.legal-copy p, .legal-copy li { color: #505156; }
+.legal-copy ul { margin: 0 0 1.25rem; padding-left: 1.25rem; }
+.legal-copy li + li { margin-top: .45rem; }
+.legal-copy a { color: var(--dark-gold); text-decoration: underline; text-underline-offset: .18em; }
+.legal-updated { margin: 0 0 2rem; color: var(--stone); font-size: .85rem; }
 .feature-grid, .service-grid, .region-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: clamp(2.5rem, 5vw, 4.5rem); }
 .feature-card, .service-card, .region-grid article { padding: clamp(1.5rem, 3vw, 2.5rem); border: 1px solid rgb(212 175 124 / .3); }
 .feature-card h3, .service-card h3, .region-grid h3 { margin-bottom: .85rem; font-size: clamp(1.75rem, 3vw, 2.25rem); }
