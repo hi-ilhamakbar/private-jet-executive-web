@@ -52,13 +52,13 @@ final class InquiryForms
     }
 
     /** @param array<string, mixed> $input
-     *  @return array{errors: array<string, string>, old: array<string, string>, notice: string|null, submitted: bool}
+     *  @return array{errors: array<string, string>, old: array<string, string>, notice: string|null, submitted: bool, ready: bool}
      */
     public static function process(string $form, array $input): array
     {
         self::startSession();
         $old = self::oldValues($input);
-        $result = ['errors' => [], 'old' => $old, 'notice' => null, 'submitted' => true];
+        $result = ['errors' => [], 'old' => $old, 'notice' => null, 'submitted' => true, 'ready' => false];
 
         if (!self::withinRateLimit($form)) {
             $result['errors']['_form'] = 'Please wait a few minutes before trying again.';
@@ -91,8 +91,36 @@ final class InquiryForms
         }
 
         self::rotateCaptcha($form);
-        $result['notice'] = 'Online delivery is being finalised. Please email charter@privatejetexecutive.com so our team can assist you directly.';
+        $result['ready'] = true;
         return $result;
+    }
+
+    /** @param array<string, string> $data */
+    public static function isDuplicateSubmission(string $form, array $data): bool
+    {
+        self::startSession();
+        $key = hash('sha256', $form . '|' . json_encode($data));
+        $timestamp = $_SESSION['recent_submissions'][$key] ?? 0;
+
+        return is_int($timestamp) && $timestamp > time() - 600;
+    }
+
+    /** @param array<string, string> $data */
+    public static function rememberSubmission(string $form, array $data): void
+    {
+        $_SESSION['recent_submissions'][hash('sha256', $form . '|' . json_encode($data))] = time();
+    }
+
+    public static function flashSuccess(string $form, string $reference): void
+    {
+        $_SESSION['form_flash'][$form] = $reference;
+    }
+
+    public static function consumeFlash(string $form): ?string
+    {
+        $reference = $_SESSION['form_flash'][$form] ?? null;
+        unset($_SESSION['form_flash'][$form]);
+        return is_string($reference) ? $reference : null;
     }
 
     /** @return array<string, string> */
