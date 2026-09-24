@@ -18,7 +18,7 @@ $escape = static fn (string $value): string => htmlspecialchars($value, ENT_QUOT
             <h2>Tell us where you need to be.</h2>
             <div class="prose"><p>Include your proposed departure and arrival points, preferred dates, passenger numbers and any details that are important to your journey. A member of our team will respond personally.</p><p>PrivateJetExecutive.com coordinates charter solutions from Indonesia to destinations worldwide. All arrangements remain subject to availability and final confirmation.</p></div>
         </div>
-        <aside class="contact-card" aria-label="Contact details"><p class="eyebrow eyebrow--dark">Email our team</p><a class="contact-card__email" href="mailto:charter@privatejetexecutive.com">charter@privatejetexecutive.com</a><p>For private charter enquiries and travel requirements.</p><p class="contact-card__address">Ruko Jl. Pandanaran No.1C Kav. 9, Pekunden, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah 50134</p><a class="button" href="mailto:charter@privatejetexecutive.com?subject=Private%20Charter%20Enquiry">Email our team</a></aside>
+        <aside class="contact-card" aria-label="Contact details"><p class="eyebrow eyebrow--dark">Email our team</p><a class="contact-card__email" href="mailto:charter@privatejetexecutive.com">charter@privatejetexecutive.com</a><p>For private charter enquiries and travel requirements.</p><p class="contact-card__address">Ruko Jl. Pandanaran No. 1C Kav. 9, Pekunden, Kec. Semarang Tengah, Kota Semarang, Jawa Tengah - Indonesia 50134</p><a class="button" href="mailto:charter@privatejetexecutive.com?subject=Private%20Charter%20Enquiry">Email our team</a></aside>
     </div>
 </section>
 
