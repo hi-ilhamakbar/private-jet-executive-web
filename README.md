@@ -43,7 +43,23 @@ storage/logs/             Runtime logs; contents are ignored
 
 Never commit SMTP, database, API, or server credentials. Copy `.env.example` to a secret location outside `public_html`, configure real environment variables there, and ensure it is unreadable by the web server's public path. `config/config.example.php` is a documented fallback shape, not production configuration.
 
-In cPanel, either set the domain document root to `public/`, or deploy the contents of `public/` to `public_html` and keep `app/`, `config/`, `templates/`, `storage/`, and secrets one level above it. Update the include paths accordingly if using the latter arrangement.
+### cPanel deployment where document roots must remain under `public_html`
+
+Keep the Git repository outside the public web root, for example at:
+
+```text
+/home/ACCOUNT/repositories/private-jet-executive-web
+```
+
+Copy the **contents** of its `public/` directory—not the `public` folder itself—to the domain document root, for example:
+
+```text
+/home/ACCOUNT/public_html/privatejetexecutive.com
+```
+
+In that document root, copy `runtime-config.example.php` to `runtime-config.php` and set `app_root` to the repository's absolute path. The runtime configuration is ignored by Git and blocked from direct HTTP access. The entry point also recognizes `PJE_APP_ROOT` when the server makes environment variables available.
+
+Do not copy `app/`, `config/`, `templates/`, or `storage/` inside the domain document root; keeping them in the repository prevents public access.
 
 For production, enable HTTPS and add `Strict-Transport-Security` at the web-server level after HTTPS is verified. Revisit CSP when third-party integrations (airport search, analytics, maps, or payment services) are introduced.
 

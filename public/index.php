@@ -5,8 +5,60 @@ declare(strict_types=1);
 use App\Core\Router;
 use App\Core\View;
 
-require dirname(__DIR__) . '/app/Core/Router.php';
-require dirname(__DIR__) . '/app/Core/View.php';
+/**
+ * Resolve the non-public application directory.
+ *
+ * Local development uses the repository parent of /public. On cPanel, copy
+ * only /public into the domain document root and provide the repository path
+ * through public/runtime-config.php or the PJE_APP_ROOT environment variable.
+ */
+function projectRoot(): string
+{
+    $candidates = [dirname(__DIR__)];
+    $runtimeConfig = __DIR__ . '/runtime-config.php';
+
+    if (is_file($runtimeConfig)) {
+        $config = require $runtimeConfig;
+
+        if (is_array($config) && is_string($config['app_root'] ?? null)) {
+            $candidates[] = $config['app_root'];
+        }
+    }
+
+    $environmentRoot = getenv('PJE_APP_ROOT');
+    if (is_string($environmentRoot) && $environmentRoot !== '') {
+        $candidates[] = $environmentRoot;
+    }
+
+    $documentRoot = $_SERVER['DOCUMENT_ROOT'] ?? '';
+    if (is_string($documentRoot) && $documentRoot !== '') {
+        // Standard cPanel layout: /home/ACCOUNT/public_html/DOMAIN.
+        $accountRoot = dirname(dirname($documentRoot));
+        $candidates[] = $accountRoot . '/repositories/private-jet-executive-web';
+    }
+
+    foreach ($candidates as $candidate) {
+        $resolved = realpath($candidate);
+
+        if ($resolved !== false && is_file($resolved . '/app/Core/Router.php')) {
+            return $resolved;
+        }
+    }
+
+    throw new RuntimeException('Application root could not be resolved.');
+}
+
+try {
+    $projectRoot = projectRoot();
+} catch (RuntimeException $exception) {
+    error_log('PrivateJetExecutive application root is unavailable.');
+    http_response_code(500);
+    header('Content-Type: text/html; charset=utf-8');
+    exit('Service temporarily unavailable.');
+}
+
+require $projectRoot . '/app/Core/Router.php';
+require $projectRoot . '/app/Core/View.php';
 
 date_default_timezone_set('Asia/Jakarta');
 

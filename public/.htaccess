@@ -5,6 +5,6 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
-<FilesMatch "^(\.env|\.git|composer\.(json|lock))">
+<FilesMatch "^(\.env|\.git|composer\.(json|lock)|runtime-config(\.example)?\.php)$">
     Require all denied
 </FilesMatch>
