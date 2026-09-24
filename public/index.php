@@ -75,7 +75,7 @@ $router = new Router([
     '/service' => 'services',
     '/destinations' => 'destinations',
     '/about' => 'about',
-    '/contact' => 'coming-soon',
+    '/contact' => 'contact',
 ]);
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
@@ -115,6 +115,11 @@ $pageData = match ($page) {
         'pageTitle' => 'About Us',
         'metaDescription' => 'An Indonesia-based private aviation service with a global outlook and personal approach.',
         'canonicalPath' => '/about',
+    ],
+    'contact' => [
+        'pageTitle' => 'Contact Our Team',
+        'metaDescription' => 'Speak with the Private Jet Executive team about your private charter requirements.',
+        'canonicalPath' => '/contact',
     ],
     default => [
         'pageTitle' => 'PrivateJetExecutive.com',
