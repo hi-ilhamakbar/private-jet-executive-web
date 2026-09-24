@@ -67,4 +67,6 @@ For production, enable HTTPS and add `Strict-Transport-Security` at the web-serv
 
 The contact and charter pages include server-side validation, CSRF tokens, honeypot protection, session-backed arithmetic CAPTCHA, and basic session rate limiting. They deliberately do not store or email enquiries yet: until the SMTP feature is configured, a valid submission directs visitors to `charter@privatejetexecutive.com` rather than claiming delivery.
 
+Airport and city lookup is routed through `public/api/airports.php`. The endpoint validates each query, applies a session rate limit, uses a short server-side cURL timeout, and forwards the request to RateHawk without exposing credentials in browser code. The cPanel deployment configuration includes this endpoint.
+
 Before activating email delivery, configure PHPMailer, SMTP credentials outside the web root, customer and internal email templates, and appropriate SPF, DKIM, and DMARC records. The next technical addition after SMTP is the airport-search proxy.

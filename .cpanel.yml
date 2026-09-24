@@ -10,4 +10,6 @@ deployment:
     - /bin/cp public/robots.txt $DEPLOYPATH/robots.txt
     - /bin/cp public/sitemap.xml $DEPLOYPATH/sitemap.xml
     - /bin/cp public/runtime-config.example.php $DEPLOYPATH/runtime-config.example.php
+    - /bin/mkdir -p $DEPLOYPATH/api
+    - /bin/cp public/api/airports.php $DEPLOYPATH/api/airports.php
     - /bin/cp -R public/assets $DEPLOYPATH/

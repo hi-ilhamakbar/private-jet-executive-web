@@ -104,6 +104,13 @@ final class InquiryForms
         self::required($values, $errors, 'arrival', 'Please enter an arrival location.');
         self::required($values, $errors, 'departure_date', 'Please select a departure date.');
         self::required($values, $errors, 'departure_time', 'Please select an estimated departure time.');
+        self::required($values, $errors, 'adults', 'Please enter the number of adult passengers.');
+
+        self::validateDate($values, $errors, 'departure_date', 'Departure date must be today or a future date.');
+        self::validateFiveMinuteTime($values, $errors, 'departure_time');
+        self::validatePassengerCount($values, $errors, 'adults', 1, 'At least one adult passenger is required.');
+        self::validatePassengerCount($values, $errors, 'children', 0, 'Please enter a valid number of child passengers.');
+        self::validatePassengerCount($values, $errors, 'infants', 0, 'Please enter a valid number of infant passengers.');
 
         if (($values['journey_type'] ?? '') === 'return') {
             self::required($values, $errors, 'return_date', 'Please select a return date.');
@@ -113,6 +120,8 @@ final class InquiryForms
                 && $values['return_date'] < $values['departure_date']) {
                 $errors['return_date'] = 'Return date cannot be earlier than departure date.';
             }
+            self::validateDate($values, $errors, 'return_date', 'Return date must be today or a future date.');
+            self::validateFiveMinuteTime($values, $errors, 'return_time');
         }
 
         if (mb_strlen($values['notes'] ?? '') > 500) {
@@ -173,6 +182,43 @@ final class InquiryForms
         }
     }
 
+    /** @param array<string, string> $errors */
+    private static function validateDate(array $values, array &$errors, string $field, string $message): void
+    {
+        $value = $values[$field] ?? '';
+        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value, new \DateTimeZone('Asia/Jakarta'));
+        $today = new \DateTimeImmutable('today', new \DateTimeZone('Asia/Jakarta'));
+
+        if ($value !== '' && ($date === false || $date->format('Y-m-d') !== $value || $date < $today)) {
+            $errors[$field] = $message;
+        }
+    }
+
+    /** @param array<string, string> $errors */
+    private static function validateFiveMinuteTime(array $values, array &$errors, string $field): void
+    {
+        $value = $values[$field] ?? '';
+
+        if ($value === '') {
+            return;
+        }
+
+        $parts = explode(':', $value);
+        if (count($parts) !== 2 || !ctype_digit($parts[0]) || !ctype_digit($parts[1]) || (int) $parts[0] > 23 || (int) $parts[1] > 59 || (int) $parts[1] % 5 !== 0) {
+            $errors[$field] = 'Please choose a time in five-minute intervals.';
+        }
+    }
+
+    /** @param array<string, string> $errors */
+    private static function validatePassengerCount(array $values, array &$errors, string $field, int $minimum, string $message): void
+    {
+        $value = $values[$field] ?? '';
+
+        if ($value !== '' && (!ctype_digit($value) || (int) $value < $minimum || (int) $value > 99)) {
+            $errors[$field] = $message;
+        }
+    }
+
     /** @return array<string, string> */
     private static function validateCaptcha(string $form, string $answer): array
     {
@@ -191,7 +237,7 @@ final class InquiryForms
      */
     private static function oldValues(array $input): array
     {
-        $allowed = ['full_name', 'email', 'country_code', 'phone', 'journey_type', 'departure', 'arrival', 'departure_date', 'departure_time', 'return_date', 'return_time', 'notes', 'topic', 'subject', 'message'];
+        $allowed = ['full_name', 'email', 'country_code', 'phone', 'journey_type', 'departure', 'arrival', 'departure_date', 'departure_time', 'return_date', 'return_time', 'adults', 'children', 'infants', 'notes', 'topic', 'subject', 'message'];
         $values = [];
 
         foreach ($allowed as $field) {
