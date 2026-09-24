@@ -10,9 +10,9 @@ return [
     'app_url' => 'https://privatejetexecutive.com',
     'timezone' => 'Asia/Jakarta',
     'mail' => [
-        'host' => 'mail.example.com',
+        'host' => 'mail.jasatiketmurah.com',
         'port' => 465,
-        'username' => 'noreply@example.com',
+        'username' => 'charter@privatejetexecutive.com',
         'password' => 'change-me',
         'encryption' => 'ssl',
     ],

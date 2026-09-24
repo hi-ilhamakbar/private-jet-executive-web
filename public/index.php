@@ -5,6 +5,9 @@ declare(strict_types=1);
 use App\Core\Router;
 use App\Core\View;
 use App\Forms\InquiryForms;
+use App\Forms\InquiryReference;
+use App\Mail\InquiryMailer;
+use App\Core\Environment;
 
 /**
  * Resolve the non-public application directory.
@@ -60,9 +63,13 @@ try {
 
 require $projectRoot . '/app/Core/Router.php';
 require $projectRoot . '/app/Core/View.php';
+require $projectRoot . '/app/Core/Environment.php';
 require $projectRoot . '/app/Forms/InquiryForms.php';
+require $projectRoot . '/app/Forms/InquiryReference.php';
+require $projectRoot . '/app/Mail/InquiryMailer.php';
 
 date_default_timezone_set('Asia/Jakarta');
+Environment::load($projectRoot);
 
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
@@ -88,7 +95,7 @@ $formName = match ($page) {
     'contact' => 'contact',
     default => null,
 };
-$formState = ['errors' => [], 'old' => [], 'notice' => null, 'submitted' => false];
+$formState = ['errors' => [], 'old' => [], 'notice' => null, 'submitted' => false, 'ready' => false];
 $csrfToken = '';
 $captchaQuestion = '';
 
@@ -98,6 +105,30 @@ if ($formName !== null) {
 
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $formState = InquiryForms::process($formName, $_POST);
+
+        if ($formState['ready'] === true) {
+            if (InquiryForms::isDuplicateSubmission($formName, $formState['old'])) {
+                $formState['notice'] = 'We have already received this enquiry. Our team will be in touch shortly.';
+            } else {
+                try {
+                    $reference = InquiryReference::generate($formName);
+                    InquiryMailer::send($formName, $formState['old'], $reference);
+                    InquiryForms::rememberSubmission($formName, $formState['old']);
+                    InquiryForms::flashSuccess($formName, $reference);
+                    header('Location: ' . $path, true, 303);
+                    exit;
+                } catch (Throwable $exception) {
+                    error_log('Inquiry email delivery failed: ' . $exception->getMessage());
+                    $formState['errors']['_form'] = 'We could not send your enquiry at this time. Please email charter@privatejetexecutive.com directly.';
+                }
+            }
+        }
+    } else {
+        $reference = InquiryForms::consumeFlash($formName);
+        if ($reference !== null) {
+            $label = $formName === 'charter' ? 'charter inquiry' : 'message';
+            $formState['notice'] = 'Your ' . $label . ' has been received. Reference: ' . $reference . '. A confirmation has been sent to your email address.';
+        }
     }
 
     $captchaQuestion = InquiryForms::captcha($formName)['question'];
