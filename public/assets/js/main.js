@@ -190,14 +190,29 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
   let requestId = 0;
 
   const resultLabel = (item) => {
-    const city = item.city?.name || item.city_name || item.city || item.location?.city || '';
-    const name = item.name || item.airport_name || item.title || '';
-    const code = item.iata || item.iata_code || item.code || item.airport_code || '';
-    const country = item.country?.name || item.country_name || item.country || '';
+    const city = String(item.city?.name || item.city_name || item.city || item.location?.city || '').trim();
+    const name = String(item.name || item.airport_name || item.title || '').trim();
+    const code = String(item.iata || item.iata_code || item.code || item.airport_code || '').trim().toUpperCase();
+    const country = String(item.country?.name || item.country_name || item.country || '').trim();
     const location = city || name;
-    const airport = name && name !== location ? ` — ${name}` : '';
+    const airport = name && name.toLocaleLowerCase() !== location.toLocaleLowerCase() ? ` — ${name}` : '';
     const identifier = code ? ` (${code})` : '';
     return `${location}${identifier}${airport}${country ? ` — ${country}` : ''}`;
+  };
+  const normaliseResults = (list) => {
+    const seen = new Set();
+
+    return list.reduce((normalised, item) => {
+      if (!item || typeof item !== 'object') return normalised;
+      const label = resultLabel(item).replace(/\s+/g, ' ').trim();
+      const code = String(item.iata || item.iata_code || item.code || item.airport_code || '').trim().toUpperCase();
+      const key = (code || label).toLocaleLowerCase();
+
+      if (!label || seen.has(key) || normalised.length >= 8) return normalised;
+      seen.add(key);
+      normalised.push(item);
+      return normalised;
+    }, []);
   };
   const closeResults = () => {
     items = [];
@@ -262,7 +277,7 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
       if (!response.ok) throw new Error('Search request failed');
       const payload = await response.json();
       const list = Array.isArray(payload) ? payload : payload.data || payload.regions || payload.items || payload.results || [];
-      if (currentRequest === requestId) render(Array.isArray(list) ? list : []);
+      if (currentRequest === requestId) render(Array.isArray(list) ? normaliseResults(list) : []);
     } catch (error) {
       if (error.name !== 'AbortError' && currentRequest === requestId) { closeResults(); status.textContent = 'Airport search is temporarily unavailable. Please enter the location manually.'; }
     } finally {
