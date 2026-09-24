@@ -1,7 +1,7 @@
 <header class="site-header" data-header>
     <div class="container header__inner">
         <a class="brand" href="/" aria-label="Private Jet Executive home">
-            <img src="/assets/images/logo.png" alt="Private Jet Executive — Global Reach. Personal Service." width="1073" height="367">
+            <img src="/assets/images/logo-transparent.png" alt="Private Jet Executive — Global Reach. Personal Service." width="2146" height="733">
         </a>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation" data-menu-toggle>
             <span class="sr-only">Open navigation</span><span></span><span></span>
