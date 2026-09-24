@@ -30,10 +30,11 @@ document.querySelectorAll('[data-count-target]').forEach((input) => {
   updateCount();
 });
 
-const returnFields = document.querySelectorAll('[data-return-field]');
-const returnInputs = document.querySelectorAll('[data-return-field] input, [data-return-field] [data-time-trigger]');
-const departureDate = document.getElementById('departure_date');
-const returnDate = document.getElementById('return_date');
+const charterForm = document.querySelector('[data-inquiry-form]');
+const returnFields = charterForm?.querySelectorAll('[data-return-field]') ?? [];
+const returnInputs = charterForm?.querySelectorAll('[data-return-field] input, [data-return-field] [data-time-trigger]') ?? [];
+const departureDate = charterForm?.querySelector('#departure_date');
+const returnDate = charterForm?.querySelector('#return_date');
 const setJourneyType = () => {
   const isReturn = document.querySelector('[data-journey-type][value="return"]')?.checked;
   returnFields.forEach((field) => {
