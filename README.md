@@ -65,8 +65,18 @@ For production, enable HTTPS and add `Strict-Transport-Security` at the web-serv
 
 ## Next implementation phase
 
-The contact and charter pages include server-side validation, CSRF tokens, honeypot protection, session-backed arithmetic CAPTCHA, and basic session rate limiting. They deliberately do not store or email enquiries yet: until the SMTP feature is configured, a valid submission directs visitors to `charter@privatejetexecutive.com` rather than claiming delivery.
+The contact and charter pages include server-side validation, CSRF tokens, honeypot protection, session-backed arithmetic CAPTCHA, rate limiting, reference numbers, and SMTP delivery via PHPMailer.
 
 Airport and city lookup is routed through `public/api/airports.php`. The endpoint validates each query, applies a session rate limit, uses a short server-side cURL timeout, and forwards the request to RateHawk without exposing credentials in browser code. The cPanel deployment configuration includes this endpoint.
 
-Before activating email delivery, configure PHPMailer, SMTP credentials outside the web root, customer and internal email templates, and appropriate SPF, DKIM, and DMARC records. The next technical addition after SMTP is the airport-search proxy.
+### SMTP production setup
+
+Install production dependencies from the repository root before accepting live enquiries:
+
+```powershell
+composer install --no-dev --optimize-autoloader
+```
+
+Create `/home/ACCOUNT/privatejetexecutive-config/.env` outside `public_html` by copying `.env.example`, then set the real `SMTP_PASSWORD`. Alternatively, set `PJE_ENV_PATH` to an absolute path to that file through the hosting environment. Never place the real `.env` in the repository or document root.
+
+The application sends the customer confirmation from `MAIL_FROM`, uses `MAIL_REPLY_TO` for replies, and BCCs the addresses in `MAIL_BCC_1` and `MAIL_BCC_2`. Configure SPF, DKIM, and DMARC with the actual email provider before enabling production use.
