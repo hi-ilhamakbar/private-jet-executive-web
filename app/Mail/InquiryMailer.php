@@ -13,13 +13,7 @@ final class InquiryMailer
     /** @param array<string, string> $data */
     public static function send(string $form, array $data, string $reference): void
     {
-        $autoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
-
-        if (!is_file($autoload)) {
-            throw new \RuntimeException('Mail dependency is not installed.');
-        }
-
-        require_once $autoload;
+        self::loadMailerLibrary();
         $mail = self::mailer();
         $isCharter = $form === 'charter';
         $name = $data['full_name'];
@@ -29,6 +23,30 @@ final class InquiryMailer
         $mail->Body = self::renderTemplate($isCharter, $data, $reference);
         $mail->AltBody = self::plainText($isCharter, $data, $reference);
         $mail->send();
+    }
+
+    private static function loadMailerLibrary(): void
+    {
+        $vendor = dirname(__DIR__, 2) . '/vendor';
+        $composerAutoload = $vendor . '/autoload.php';
+
+        if (is_file($composerAutoload)) {
+            require_once $composerAutoload;
+            return;
+        }
+
+        // Supports a direct PHPMailer source upload when Composer is unavailable on shared hosting.
+        $source = $vendor . '/PHPMailer-master/src';
+        $required = [$source . '/Exception.php', $source . '/SMTP.php', $source . '/PHPMailer.php'];
+        foreach ($required as $file) {
+            if (!is_file($file)) {
+                throw new \RuntimeException('Mail dependency is not installed.');
+            }
+        }
+
+        foreach ($required as $file) {
+            require_once $file;
+        }
     }
 
     private static function mailer(): PHPMailer
