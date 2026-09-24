@@ -132,7 +132,10 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
     const name = item.name || item.airport_name || item.title || '';
     const code = item.iata || item.iata_code || item.code || item.airport_code || '';
     const country = item.country?.name || item.country_name || item.country || '';
-    return [city, name !== city ? name : '', code ? `(${code})` : '', country].filter(Boolean).join(' · ');
+    const location = city || name;
+    const airport = name && name !== location ? ` — ${name}` : '';
+    const identifier = code ? ` (${code})` : '';
+    return `${location}${identifier}${airport}${country ? ` — ${country}` : ''}`;
   };
   const closeResults = () => {
     items = [];
