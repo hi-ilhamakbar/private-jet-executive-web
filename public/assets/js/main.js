@@ -296,3 +296,49 @@ document.querySelectorAll('[data-airport-search]').forEach((input) => {
   });
   input.addEventListener('blur', () => window.setTimeout(closeResults, 150));
 });
+
+const amountWords = (value) => {
+  const small = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+  const words = (number) => {
+    if (number < 20) return small[number];
+    if (number < 100) return `${tens[Math.floor(number / 10)]}${number % 10 ? `-${small[number % 10]}` : ''}`;
+    if (number < 1000) return `${small[Math.floor(number / 100)]} Hundred${number % 100 ? ` ${words(number % 100)}` : ''}`;
+    for (const [unit, label] of [[1000000000, 'Billion'], [1000000, 'Million'], [1000, 'Thousand']]) if (number >= unit) return `${words(Math.floor(number / unit))} ${label}${number % unit ? ` ${words(number % unit)}` : ''}`;
+    return 'Zero';
+  };
+  const numeric = Number(value.replace(/,/g, ''));
+  if (!Number.isFinite(numeric) || numeric <= 0) return 'Enter a total amount to preview the wording.';
+  const cents = Math.round(numeric * 100);
+  const dollars = Math.floor(cents / 100);
+  const remainder = cents % 100;
+  return `${words(dollars)} US Dollars${remainder ? ` and ${words(remainder)} Cents` : ''} Only`;
+};
+
+document.querySelectorAll('[data-currency-input]').forEach((input) => {
+  const form = input.closest('form');
+  const output = form?.querySelector('[data-amount-words]');
+  const refresh = () => { if (output) output.textContent = amountWords(input.value); };
+  input.addEventListener('input', () => {
+    const clean = input.value.replace(/[^0-9.]/g, '');
+    const [whole = '', fraction = ''] = clean.split('.', 2);
+    const grouped = whole ? Number(whole).toLocaleString('en-US') : '';
+    input.value = `${grouped}${clean.includes('.') ? `.${fraction.slice(0, 2)}` : ''}`;
+    refresh();
+  });
+  refresh();
+});
+
+document.querySelectorAll('[data-invoice-journey]').forEach((select) => {
+  const form = select.closest('form');
+  const returnField = form?.querySelector('[data-return-field]');
+  const returnInput = returnField?.querySelector('input');
+  const update = () => {
+    const isReturn = select.value === 'return';
+    returnField.hidden = !isReturn;
+    returnInput.disabled = !isReturn;
+    returnInput.required = isReturn;
+  };
+  select.addEventListener('change', update);
+  update();
+});

@@ -16,6 +16,7 @@ public/runtime-config.php
 !/storage/sessions/.gitkeep
 /storage/cache/*
 !/storage/cache/.gitkeep
+/output/pdf/*.pdf
 
 # Editor and operating-system files
 .DS_Store

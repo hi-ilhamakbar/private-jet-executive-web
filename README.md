@@ -80,3 +80,15 @@ composer install --no-dev --optimize-autoloader
 Create `/home/ACCOUNT/privatejetexecutive-config/.env` outside `public_html` by copying `.env.example`, then set the real `SMTP_PASSWORD`. Alternatively, set `PJE_ENV_PATH` to an absolute path to that file through the hosting environment. Never place the real `.env` in the repository or document root.
 
 The application sends the customer confirmation from `MAIL_FROM`, uses `MAIL_REPLY_TO` for replies, and BCCs the addresses in `MAIL_BCC_1` and `MAIL_BCC_2`. Configure SPF, DKIM, and DMARC with the actual email provider before enabling production use.
+
+### Invoice administration
+
+The protected invoice workspace is available at `/admin/invoices`. Set `ADMIN_USERNAME` and a PHP password hash in the secret `.env` outside `public_html`; never store an admin password in source control. Generate a hash locally with:
+
+```powershell
+php -r "echo password_hash('choose-a-strong-password', PASSWORD_DEFAULT), PHP_EOL;"
+```
+
+Create a MySQL or MariaDB database and database user in cPanel, then place `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in the same secret `.env`. Import `database/migrations/001_create_invoices.sql` through phpMyAdmin before using the workspace. The migration enforces invoice-number uniqueness.
+
+Invoices use Asia/Jakarta for their generated date and follow `#INV/YYMMDD/EEEEE`. The final five digits are epoch-derived; insertion occurs under a unique database key and retries a collision before a PDF is produced. Monetary values are stored as integer USD cents. PDFs are generated server-side with Dompdf and downloaded directly to the authenticated administrator.
