@@ -88,6 +88,36 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 .contact-card__email { display: block; overflow-wrap: anywhere; margin-bottom: 1.25rem; color: var(--pearl); font-family: var(--font-display); font-size: clamp(1.85rem, 3.5vw, 2.75rem); line-height: 1.05; }
 .contact-card__email:hover { color: var(--signature-gold); }
 .contact-card > p:not(.eyebrow) { margin: 0 0 1.75rem; color: var(--champagne); font-size: .9rem; }
+.form-shell { max-width: 1020px; }
+.form-shell__heading { max-width: 38rem; margin-bottom: 2.5rem; }
+.form-shell__heading > p:last-child { color: var(--stone); }
+.inquiry-form { padding: clamp(1.25rem, 4vw, 3rem); border: 1px solid rgb(212 175 124 / .3); background: rgb(27 29 33 / .45); }
+.inquiry-form--light { border-color: rgb(27 29 33 / .18); background: #fffdfa; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.field { display: grid; gap: .45rem; }
+.field--full { grid-column: 1 / -1; }
+.field label, .journey-type legend { color: var(--pearl); font-size: .78rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.inquiry-form--light .field label, .inquiry-form--light .journey-type legend { color: var(--charcoal); }
+.field input, .field select, .field textarea { width: 100%; border: 1px solid rgb(234 220 200 / .34); border-radius: 2px; padding: .85rem .9rem; color: var(--pearl); background: rgb(10 15 28 / .55); }
+.inquiry-form--light .field input, .inquiry-form--light .field select, .inquiry-form--light .field textarea { border-color: rgb(27 29 33 / .25); color: var(--charcoal); background: var(--pearl); }
+.field textarea { min-height: 8rem; resize: vertical; }
+.field input::placeholder, .field textarea::placeholder { color: var(--stone); }
+.field-meta { display: flex; justify-content: space-between; gap: .75rem; color: var(--stone); }
+.field-error { color: #f1adb1; font-size: .78rem; }
+.inquiry-form--light .field-error { color: var(--signature-burgundy); }
+.phone-group { display: grid; grid-template-columns: minmax(9rem, 1.25fr) minmax(0, 1fr); gap: .5rem; }
+.journey-type { display: flex; flex-wrap: wrap; gap: 1.25rem; margin: 0 0 1.5rem; padding: 0; border: 0; }
+.journey-type legend { width: 100%; margin-bottom: .25rem; }
+.journey-type label { color: var(--pearl); font-size: .92rem; }
+.inquiry-form--light .journey-type label { color: var(--charcoal); }
+.journey-type input { accent-color: var(--signature-gold); }
+.form-submit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgb(212 175 124 / .24); }
+.form-submit p { max-width: 42rem; margin: 0; color: var(--champagne); font-size: .78rem; }
+.inquiry-form--light .form-submit p { color: #505156; }
+.form-notice { margin: 0 0 1.25rem; padding: 1rem 1.2rem; border-left: 2px solid var(--signature-gold); color: var(--champagne); background: rgb(212 175 124 / .12); }
+.form-notice--error { border-color: #f1adb1; color: #ffd8da; background: rgb(74 15 20 / .55); }
+.honeypot { position: absolute; overflow: hidden; width: 1px; height: 1px; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.optional { color: var(--stone); font-size: .7rem; font-weight: 400; text-transform: none; }
 .site-footer { border-top: 1px solid rgb(212 175 124 / .25); color: var(--champagne); background: #070b13; }
 .footer__inner { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 2rem; padding-block: 4rem; }
 .footer__brand { display: inline-block; color: var(--pearl); font-family: var(--font-display); font-size: 1.9rem; }
@@ -104,7 +134,9 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 @media (max-width: 700px) {
   .foundation-hero, .interior-hero { min-height: 39rem; }
   .page-hero { min-height: 32rem; }
-  .grid-two, .footer__inner, .section-intro, .feature-grid, .service-grid, .region-grid, .contact-layout { grid-template-columns: 1fr; }
+  .grid-two, .footer__inner, .section-intro, .feature-grid, .service-grid, .region-grid, .contact-layout, .form-grid { grid-template-columns: 1fr; }
+  .field--full { grid-column: auto; }
+  .phone-group { grid-template-columns: 1fr; }
   .footer__bottom { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
