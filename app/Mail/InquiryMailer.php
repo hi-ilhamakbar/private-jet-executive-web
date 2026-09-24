@@ -67,7 +67,7 @@ final class InquiryMailer
         $mail->Password = Environment::get('SMTP_PASSWORD');
         $mail->SMTPSecure = Environment::get('SMTP_ENCRYPTION', 'ssl') === 'ssl' ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
         $mail->CharSet = PHPMailer::CHARSET_UTF8;
-        $mail->setFrom(Environment::get('MAIL_FROM'), Environment::get('MAIL_FROM_NAME', 'PrivateJetExecutive.com'));
+        $mail->setFrom(Environment::get('MAIL_FROM'), Environment::get('MAIL_FROM_NAME', 'Private Jet Executive'));
         $mail->addReplyTo(Environment::get('MAIL_REPLY_TO', 'charter@privatejetexecutive.com'));
 
         foreach (['MAIL_BCC_1', 'MAIL_BCC_2'] as $key) {
@@ -86,8 +86,8 @@ final class InquiryMailer
         $details = self::details($isCharter, $data, $reference);
         $heading = $isCharter ? 'Your Private Charter Inquiry' : 'Thank You for Contacting Us';
         $intro = $isCharter
-            ? 'Dear ' . $data['full_name'] . ', thank you for contacting PrivateJetExecutive.com. We have received your charter inquiry. A member of our team will review your requirements and contact you regarding the next steps.'
-            : 'Dear ' . $data['full_name'] . ', thank you for contacting PrivateJetExecutive.com. We have received your message and a member of our team will respond as soon as possible.';
+            ? 'Dear ' . $data['full_name'] . ', thank you for contacting Private Jet Executive. We have received your charter inquiry. A member of our team will review your requirements and contact you regarding the next steps.'
+            : 'Dear ' . $data['full_name'] . ', thank you for contacting Private Jet Executive. We have received your message and a member of our team will respond as soon as possible.';
         $disclaimer = $isCharter
             ? 'Submission of an inquiry is not a booking, aircraft, price, or payment confirmation. All arrangements remain subject to availability, quotation, operational requirements, and final confirmation.'
             : 'This message confirms receipt of your enquiry. Please do not send payment details by email.';
@@ -124,7 +124,7 @@ final class InquiryMailer
     /** @param array<string, string> $data */
     private static function plainText(bool $isCharter, array $data, string $reference): string
     {
-        $lines = ['PrivateJetExecutive.com', 'Reference: ' . $reference, ''];
+        $lines = ['Private Jet Executive', 'Reference: ' . $reference, ''];
         foreach (self::details($isCharter, $data, $reference) as $label => $value) {
             $lines[] = $label . ': ' . $value;
         }

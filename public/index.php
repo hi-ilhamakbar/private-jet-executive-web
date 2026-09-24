@@ -175,7 +175,7 @@ $pageData = match ($page) {
         'canonicalPath' => '/contact',
     ],
     default => [
-        'pageTitle' => 'PrivateJetExecutive.com',
+        'pageTitle' => 'Private Jet Executive',
         'metaDescription' => 'Private charter solutions from Indonesia to destinations worldwide.',
         'canonicalPath' => $path,
     ],
