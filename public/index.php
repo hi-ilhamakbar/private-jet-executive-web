@@ -62,6 +62,7 @@ try {
 }
 
 require $projectRoot . '/app/Core/Router.php';
+require $projectRoot . '/app/Core/StructuredData.php';
 require $projectRoot . '/app/Core/View.php';
 require $projectRoot . '/app/Core/Environment.php';
 require $projectRoot . '/app/Forms/InquiryForms.php';
@@ -85,6 +86,9 @@ $router = new Router([
     '/destinations' => 'destinations',
     '/about' => 'about',
     '/contact' => 'contact',
+    '/privacy' => 'privacy',
+    '/terms' => 'terms',
+    '/cookie-policy' => 'cookie-policy',
 ]);
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
@@ -173,6 +177,21 @@ $pageData = match ($page) {
         'pageTitle' => 'Contact Our Team',
         'metaDescription' => 'Speak with the Private Jet Executive team about your private charter requirements.',
         'canonicalPath' => '/contact',
+    ],
+    'privacy' => [
+        'pageTitle' => 'Privacy Policy',
+        'metaDescription' => 'How Private Jet Executive collects, uses and protects personal information.',
+        'canonicalPath' => '/privacy',
+    ],
+    'terms' => [
+        'pageTitle' => 'Terms of Use',
+        'metaDescription' => 'Terms governing use of the Private Jet Executive website and charter enquiries.',
+        'canonicalPath' => '/terms',
+    ],
+    'cookie-policy' => [
+        'pageTitle' => 'Cookie Policy',
+        'metaDescription' => 'How Private Jet Executive uses essential cookies on this website.',
+        'canonicalPath' => '/cookie-policy',
     ],
     default => [
         'pageTitle' => 'Private Jet Executive',
