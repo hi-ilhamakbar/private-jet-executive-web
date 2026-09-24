@@ -55,6 +55,70 @@ departureDate?.addEventListener('change', syncReturnDate);
 setJourneyType();
 syncReturnDate();
 
+document.querySelectorAll('[data-country-picker]').forEach((select) => {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'country-picker';
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'country-picker__button';
+  button.setAttribute('aria-label', 'Select country calling code');
+  button.setAttribute('aria-expanded', 'false');
+  const list = document.createElement('div');
+  list.className = 'country-picker__list';
+  list.hidden = true;
+  select.classList.add('country-picker__native');
+  select.parentNode.insertBefore(wrapper, select);
+  wrapper.append(select, button, list);
+
+  const selectedOption = () => select.options[select.selectedIndex];
+  const renderButton = () => {
+    const option = selectedOption();
+    const flag = option?.dataset.flag;
+    button.replaceChildren();
+    if (flag) {
+      const image = document.createElement('img');
+      image.src = `https://flagcdn.com/w40/${flag}.png`;
+      image.alt = '';
+      image.width = 20;
+      image.height = 15;
+      button.append(image);
+    }
+    button.append(document.createTextNode(option?.text || 'Country code'));
+  };
+  [...select.options].forEach((option) => {
+    if (!option.value) return;
+    const choice = document.createElement('button');
+    choice.type = 'button';
+    choice.className = 'country-picker__option';
+    const image = document.createElement('img');
+    image.src = `https://flagcdn.com/w40/${option.dataset.flag}.png`;
+    image.alt = '';
+    image.width = 20;
+    image.height = 15;
+    choice.append(image, document.createTextNode(option.text));
+    choice.addEventListener('click', () => {
+      select.value = option.value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      renderButton();
+      list.hidden = true;
+      button.setAttribute('aria-expanded', 'false');
+      button.focus();
+    });
+    list.append(choice);
+  });
+  button.addEventListener('click', () => {
+    const opening = list.hidden;
+    document.querySelectorAll('.country-picker__list').forEach((element) => element.hidden = true);
+    list.hidden = !opening;
+    button.setAttribute('aria-expanded', String(opening));
+  });
+  select.addEventListener('change', renderButton);
+  renderButton();
+  document.addEventListener('click', (event) => {
+    if (!wrapper.contains(event.target)) { list.hidden = true; button.setAttribute('aria-expanded', 'false'); }
+  });
+});
+
 document.querySelectorAll('[data-airport-search]').forEach((input) => {
   const results = document.getElementById(input.getAttribute('aria-controls'));
   const status = input.closest('.airport-field')?.querySelector('[data-airport-status]');
