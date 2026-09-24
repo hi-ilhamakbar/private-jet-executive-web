@@ -83,6 +83,11 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 .centered-copy > p:not(.eyebrow) { max-width: 37rem; margin: 1.25rem auto 2rem; color: var(--champagne); }
 .text-link { display: inline-block; margin-top: .5rem; border-bottom: 1px solid var(--signature-gold); padding-bottom: .3rem; color: var(--charcoal); font-size: .82rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 .text-link:hover { color: var(--dark-gold); }
+.contact-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(20rem, .85fr); gap: clamp(2.5rem, 8vw, 9rem); align-items: center; }
+.contact-card { padding: clamp(1.75rem, 4vw, 3rem); border-top: 2px solid var(--signature-gold); color: var(--pearl); background: var(--executive-navy); }
+.contact-card__email { display: block; overflow-wrap: anywhere; margin-bottom: 1.25rem; color: var(--pearl); font-family: var(--font-display); font-size: clamp(1.85rem, 3.5vw, 2.75rem); line-height: 1.05; }
+.contact-card__email:hover { color: var(--signature-gold); }
+.contact-card > p:not(.eyebrow) { margin: 0 0 1.75rem; color: var(--champagne); font-size: .9rem; }
 .site-footer { border-top: 1px solid rgb(212 175 124 / .25); color: var(--champagne); background: #070b13; }
 .footer__inner { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 2rem; padding-block: 4rem; }
 .footer__brand { display: inline-block; color: var(--pearl); font-family: var(--font-display); font-size: 1.9rem; }
@@ -99,7 +104,7 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 @media (max-width: 700px) {
   .foundation-hero, .interior-hero { min-height: 39rem; }
   .page-hero { min-height: 32rem; }
-  .grid-two, .footer__inner, .section-intro, .feature-grid, .service-grid, .region-grid { grid-template-columns: 1fr; }
+  .grid-two, .footer__inner, .section-intro, .feature-grid, .service-grid, .region-grid, .contact-layout { grid-template-columns: 1fr; }
   .footer__bottom { flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }
