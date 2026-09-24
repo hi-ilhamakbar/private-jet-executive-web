@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Core\Router;
 use App\Core\View;
+use App\Forms\InquiryForms;
 
 /**
  * Resolve the non-public application directory.
@@ -59,6 +60,7 @@ try {
 
 require $projectRoot . '/app/Core/Router.php';
 require $projectRoot . '/app/Core/View.php';
+require $projectRoot . '/app/Forms/InquiryForms.php';
 
 date_default_timezone_set('Asia/Jakarta');
 
@@ -66,7 +68,7 @@ header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 header('Permissions-Policy: camera=(), geolocation=(), microphone=()');
-header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
+header("Content-Security-Policy: default-src 'self'; img-src 'self' data: https://flagcdn.com; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'");
 
 $router = new Router([
     '/' => 'home',
@@ -80,6 +82,26 @@ $router = new Router([
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $page = $router->resolve($path);
+
+$formName = match ($page) {
+    'private-charter' => 'charter',
+    'contact' => 'contact',
+    default => null,
+};
+$formState = ['errors' => [], 'old' => [], 'notice' => null, 'submitted' => false];
+$csrfToken = '';
+$captchaQuestion = '';
+
+if ($formName !== null) {
+    InquiryForms::startSession();
+    $csrfToken = InquiryForms::csrfToken();
+
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        $formState = InquiryForms::process($formName, $_POST);
+    }
+
+    $captchaQuestion = InquiryForms::captcha($formName)['question'];
+}
 
 if ($page === 'not-found') {
     http_response_code(404);
@@ -128,4 +150,8 @@ $pageData = match ($page) {
     ],
 };
 
-View::render($page, $pageData);
+View::render($page, $pageData + [
+    'formState' => $formState,
+    'csrfToken' => $csrfToken,
+    'captchaQuestion' => $captchaQuestion,
+]);
