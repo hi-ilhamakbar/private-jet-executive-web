@@ -113,10 +113,17 @@ final class InquiryMailer
             return $base + ['Topic' => $data['topic'], 'Subject' => $data['subject'], 'Message' => $data['message'], 'Submitted At' => self::submittedAt()];
         }
 
-        return $base + [
+        $journeyDetails = [
             'Journey Type' => $data['journey_type'] === 'return' ? 'Return' : 'One Way',
             'Departure' => $data['departure'], 'Arrival' => $data['arrival'], 'Departure Date' => $data['departure_date'], 'Estimated Departure Time' => $data['departure_time'],
-            'Return Date' => $data['journey_type'] === 'return' ? $data['return_date'] : 'Not applicable', 'Estimated Return Time' => $data['journey_type'] === 'return' ? $data['return_time'] : 'Not applicable',
+        ];
+
+        if ($data['journey_type'] === 'return') {
+            $journeyDetails['Return Date'] = $data['return_date'];
+            $journeyDetails['Estimated Return Time'] = $data['return_time'];
+        }
+
+        return $base + $journeyDetails + [
             'Passengers' => 'Adults: ' . $data['adults'] . '; Children: ' . $data['children'] . '; Infants: ' . $data['infants'], 'Request Notes' => $data['notes'] !== '' ? $data['notes'] : 'None', 'Submitted At' => self::submittedAt(),
         ];
     }
