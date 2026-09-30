@@ -40,10 +40,10 @@ final class StructuredData
                         'email' => 'charter@privatejetexecutive.com',
                         'address' => [
                             '@type' => 'PostalAddress',
-                            'streetAddress' => 'Ruko Jl. Pandanaran No. 1C Kav. 9, Pekunden, Kec. Semarang Tengah',
-                            'addressLocality' => 'Semarang',
-                            'addressRegion' => 'Jawa Tengah',
-                            'postalCode' => '50134',
+                            'streetAddress' => 'Commercial Park Aeropolis Apartments, Jl. Aeropolis Tower A Blok DF K. 17, RT.004/RW.008, Neglasari, Kec. Neglasari',
+                            'addressLocality' => 'Tangerang',
+                            'addressRegion' => 'Banten',
+                            'postalCode' => '15129',
                             'addressCountry' => 'ID',
                         ],
                         'contactPoint' => [[

@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 use App\Core\Router;
 use App\Core\View;
+use App\Core\Database;
 use App\Forms\InquiryForms;
 use App\Forms\InquiryReference;
+use App\Invoice\InvoiceData;
+use App\Invoice\InvoicePdf;
+use App\Invoice\InvoiceRepository;
+use App\Invoice\InvoiceService;
 use App\Mail\InquiryMailer;
+use App\Mail\InvoiceMailer;
 use App\Core\Environment;
+use App\Security\AdminAuth;
 
 /**
  * Resolve the non-public application directory.
@@ -62,12 +69,19 @@ try {
 }
 
 require $projectRoot . '/app/Core/Router.php';
+require $projectRoot . '/app/Core/Database.php';
 require $projectRoot . '/app/Core/StructuredData.php';
 require $projectRoot . '/app/Core/View.php';
 require $projectRoot . '/app/Core/Environment.php';
 require $projectRoot . '/app/Forms/InquiryForms.php';
 require $projectRoot . '/app/Forms/InquiryReference.php';
 require $projectRoot . '/app/Mail/InquiryMailer.php';
+require $projectRoot . '/app/Mail/InvoiceMailer.php';
+require $projectRoot . '/app/Security/AdminAuth.php';
+require $projectRoot . '/app/Invoice/InvoiceData.php';
+require $projectRoot . '/app/Invoice/InvoiceRepository.php';
+require $projectRoot . '/app/Invoice/InvoiceService.php';
+require $projectRoot . '/app/Invoice/InvoicePdf.php';
 
 date_default_timezone_set('Asia/Jakarta');
 Environment::load($projectRoot);
@@ -89,6 +103,7 @@ $router = new Router([
     '/privacy' => 'privacy',
     '/terms' => 'terms',
     '/cookie-policy' => 'cookie-policy',
+    '/admin/invoices' => 'admin-invoices',
 ]);
 
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
@@ -136,6 +151,84 @@ if ($formName !== null) {
     }
 
     $captchaQuestion = InquiryForms::captcha($formName)['question'];
+}
+
+$adminState = ['authenticated' => false, 'errors' => [], 'notice' => null, 'values' => [], 'csrfToken' => '', 'invoices' => [], 'tab' => 'create', 'historyFilters' => []];
+if ($page === 'admin-invoices') {
+    header('Cache-Control: no-store, private');
+    AdminAuth::start();
+    $adminState['authenticated'] = AdminAuth::isAuthenticated();
+    $adminState['tab'] = (string) ($_GET['tab'] ?? '') === 'history' ? 'history' : 'create';
+
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
+        $action = (string) ($_POST['admin_action'] ?? '');
+        if ($action === 'logout' && AdminAuth::verifyCsrf((string) ($_POST['csrf_token'] ?? ''))) {
+            AdminAuth::logout();
+            header('Location: /admin/invoices', true, 303);
+            exit;
+        }
+        if ($action === 'login') {
+            if (!AdminAuth::verifyCsrf((string) ($_POST['csrf_token'] ?? ''))) {
+                $adminState['errors']['_form'] = 'Your session has expired. Please try again.';
+            } elseif (!AdminAuth::attempt(trim((string) ($_POST['username'] ?? '')), (string) ($_POST['password'] ?? ''))) {
+                $adminState['errors']['_form'] = 'Invalid login details.';
+            } else {
+                header('Location: /admin/invoices', true, 303);
+                exit;
+            }
+            $adminState['authenticated'] = AdminAuth::isAuthenticated();
+        }
+        if ($action === 'create' && $adminState['authenticated']) {
+            if (!AdminAuth::verifyCsrf((string) ($_POST['csrf_token'] ?? ''))) {
+                $adminState['errors']['_form'] = 'Your session has expired. Please refresh and try again.';
+            } else {
+                $validated = InvoiceData::validate($_POST);
+                $adminState['values'] = $validated['values'];
+                $adminState['errors'] = $validated['errors'];
+                if ($validated['errors'] === []) {
+                    try {
+                        $repository = new InvoiceRepository(Database::connect());
+                        $invoice = (new InvoiceService($repository))->create($validated['values']);
+                        $pdf = InvoicePdf::render($invoice);
+                        InvoiceMailer::send($invoice, $pdf);
+                        header('Content-Type: application/pdf');
+                        header('Content-Disposition: attachment; filename="' . str_replace(['#', '/'], ['', '-'], (string) $invoice['invoice_number']) . '.pdf"');
+                        header('Content-Length: ' . strlen($pdf));
+                        echo $pdf;
+                        exit;
+                    } catch (Throwable $exception) {
+                        error_log('Invoice generation failed: ' . $exception->getMessage());
+                        $adminState['errors']['_form'] = isset($invoice) ? 'The invoice was recorded, but the customer email could not be delivered. Please verify the SMTP configuration.' : 'The invoice could not be generated. Please verify the database and PDF configuration.';
+                    }
+                }
+            }
+        }
+    }
+
+    if ($adminState['authenticated'] && $adminState['tab'] === 'history') {
+        try {
+            $sort = (string) ($_GET['sort'] ?? 'generated_at');
+            $direction = (string) ($_GET['direction'] ?? 'desc');
+            $dateField = (string) ($_GET['date_field'] ?? 'generated_at');
+            $from = (string) ($_GET['from'] ?? '');
+            $to = (string) ($_GET['to'] ?? '');
+            $validDate = static fn (string $value): ?string => preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1 ? $value : null;
+            $filters = [
+                'sort' => $sort === 'due_at' ? 'due_at' : 'generated_at',
+                'direction' => $direction === 'asc' ? 'asc' : 'desc',
+                'date_field' => $dateField === 'due_at' ? 'due_at' : 'generated_at',
+                'from' => $validDate($from),
+                'to' => $validDate($to),
+            ];
+            if ($filters['from'] !== null && $filters['to'] !== null && $filters['from'] > $filters['to']) throw new \RuntimeException('The date range is invalid.');
+            $adminState['historyFilters'] = $filters;
+            $adminState['invoices'] = (new InvoiceRepository(Database::connect()))->search($filters['sort'], $filters['direction'], $filters['date_field'], $filters['from'], $filters['to']);
+        } catch (Throwable $exception) {
+            error_log('Invoice history failed: ' . $exception->getMessage());
+            $adminState['errors']['_form'] ??= 'Invoice history is unavailable. Verify the database configuration and date range.';
+        }
+    }
+    $adminState['csrfToken'] = AdminAuth::csrfToken();
 }
 
 if ($page === 'not-found') {
@@ -193,6 +286,11 @@ $pageData = match ($page) {
         'metaDescription' => 'How Private Jet Executive uses essential cookies on this website.',
         'canonicalPath' => '/cookie-policy',
     ],
+    'admin-invoices' => [
+        'pageTitle' => 'Invoice Administration',
+        'metaDescription' => 'Secure invoice administration.',
+        'canonicalPath' => '/admin/invoices',
+    ],
     default => [
         'pageTitle' => 'Private Jet Executive',
         'metaDescription' => 'Private charter solutions from Indonesia to destinations worldwide.',
@@ -204,4 +302,5 @@ View::render($page, $pageData + [
     'formState' => $formState,
     'csrfToken' => $csrfToken,
     'captchaQuestion' => $captchaQuestion,
+    'adminState' => $adminState,
 ]);
