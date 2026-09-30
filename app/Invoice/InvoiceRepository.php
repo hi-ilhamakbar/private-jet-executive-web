@@ -23,11 +23,14 @@ final class InvoiceRepository
     public function create(string $number, array $values, \DateTimeImmutable $generatedAt, \DateTimeImmutable $dueAt): array
     {
         $statement = $this->database->prepare(
-            'INSERT INTO invoices (invoice_number, invoice_recipient, journey_type, route, outbound_at, return_at, aircraft_type, capacity, additional_request, total_usd_cents, generated_at, due_at) VALUES (:invoice_number, :invoice_recipient, :journey_type, :route, :outbound_at, :return_at, :aircraft_type, :capacity, :additional_request, :total_usd_cents, :generated_at, :due_at)'
+            'INSERT INTO invoices (invoice_number, invoice_recipient, recipient_email, recipient_country_code, recipient_phone, journey_type, route, outbound_at, return_at, aircraft_type, capacity, additional_request, total_usd_cents, generated_at, due_at) VALUES (:invoice_number, :invoice_recipient, :recipient_email, :recipient_country_code, :recipient_phone, :journey_type, :route, :outbound_at, :return_at, :aircraft_type, :capacity, :additional_request, :total_usd_cents, :generated_at, :due_at)'
         );
         $statement->execute([
             'invoice_number' => $number,
             'invoice_recipient' => $values['invoice_recipient'],
+            'recipient_email' => $values['recipient_email'],
+            'recipient_country_code' => $values['recipient_country_code'] !== '' ? $values['recipient_country_code'] : null,
+            'recipient_phone' => $values['recipient_phone'] !== '' ? $values['recipient_phone'] : null,
             'journey_type' => $values['journey_type'],
             'route' => $values['route'],
             'outbound_at' => $values['outbound_at'],
@@ -52,8 +55,20 @@ final class InvoiceRepository
     }
 
     /** @return list<array<string, mixed>> */
-    public function latest(int $limit = 12): array
+    public function search(string $sort, string $direction, ?string $dateField, ?string $from, ?string $to, int $limit = 100): array
     {
-        return $this->database->query('SELECT invoice_number, invoice_recipient, route, aircraft_type, total_usd_cents, due_at, generated_at FROM invoices ORDER BY id DESC LIMIT ' . max(1, min($limit, 50)))->fetchAll();
+        $sortColumn = $sort === 'due_at' ? 'due_at' : 'generated_at';
+        $sortDirection = $direction === 'asc' ? 'ASC' : 'DESC';
+        $filterColumn = $dateField === 'due_at' ? 'due_at' : 'generated_at';
+        $sql = 'SELECT invoice_number, invoice_recipient, recipient_email, route, aircraft_type, total_usd_cents, due_at, generated_at FROM invoices';
+        $conditions = [];
+        $parameters = [];
+        if ($from !== null) { $conditions[] = $filterColumn . ' >= :from'; $parameters['from'] = $from . ' 00:00:00'; }
+        if ($to !== null) { $conditions[] = $filterColumn . ' <= :to'; $parameters['to'] = $to . ' 23:59:59'; }
+        if ($conditions !== []) $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        $sql .= ' ORDER BY ' . $sortColumn . ' ' . $sortDirection . ', id ' . $sortDirection . ' LIMIT ' . max(1, min($limit, 200));
+        $statement = $this->database->prepare($sql);
+        $statement->execute($parameters);
+        return $statement->fetchAll();
     }
 }

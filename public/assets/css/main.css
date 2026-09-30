@@ -92,6 +92,13 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 .admin-heading h2 { max-width: none; }
 .admin-heading p { max-width: 45rem; color: #505156; }
 .admin-form { max-width: none; }
+.admin-tabs { display: flex; gap: .25rem; margin: 0 0 2rem; border-bottom: 1px solid rgb(27 29 33 / .16); }
+.admin-tabs a { padding: .8rem 1rem; color: #5c5144; font-size: .78rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+.admin-tabs a:hover { color: var(--dark-gold); }
+.admin-tabs__link--active { border-bottom: 2px solid var(--signature-gold); color: var(--charcoal) !important; }
+.admin-filter { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .9rem; align-items: end; margin-bottom: 1.5rem; padding: 1.25rem; border: 1px solid rgb(27 29 33 / .14); background: #fffdfa; }
+.admin-filter .form-submit { display: flex; grid-column: 1 / -1; align-items: center; justify-content: flex-start; gap: 1rem; margin: 0; padding: 0; border: 0; }
+.admin-filter .button { min-height: 2.9rem; padding-inline: 1rem; }
 .amount-words output { min-height: 3.3rem; padding: .75rem .9rem; border: 1px solid rgb(27 29 33 / .18); color: #5c5144; background: #f3eee5; font-size: .88rem; font-style: italic; }
 .admin-history { overflow-x: auto; margin-top: 3.5rem; }
 .admin-history table { width: 100%; min-width: 44rem; border-collapse: collapse; font-size: .82rem; }
@@ -207,6 +214,7 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
   .field--full { grid-column: auto; }
   .phone-group { grid-template-columns: 1fr; }
   .passenger-grid { grid-template-columns: 1fr; }
+  .admin-filter { grid-template-columns: 1fr; }
   .contact-card__email { white-space: normal; }
   .footer__bottom { flex-direction: column; }
 }

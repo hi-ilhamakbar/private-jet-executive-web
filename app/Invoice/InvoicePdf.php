@@ -21,6 +21,8 @@ final class InvoicePdf
         $amount = InvoiceData::usd((int) $invoice['total_usd_cents']);
         $amountWords = InvoiceData::words((int) $invoice['total_usd_cents']);
         $generatedAt = new \DateTimeImmutable((string) $invoice['generated_at'], new \DateTimeZone('Asia/Jakarta'));
+        $recipientContact = [(string) $invoice['recipient_email']];
+        if ((string) ($invoice['recipient_phone'] ?? '') !== '') $recipientContact[] = (string) ($invoice['recipient_country_code'] ?? '') . ' ' . (string) $invoice['recipient_phone'];
         $logoPath = $projectRoot . '/public/assets/images/logo-transparent.png';
         $logoData = is_file($logoPath) ? 'data:image/png;base64,' . base64_encode((string) file_get_contents($logoPath)) : '';
 

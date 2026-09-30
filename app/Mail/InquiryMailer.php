@@ -123,6 +123,8 @@ final class InquiryMailer
             $journeyDetails['Estimated Return Time'] = $data['return_time'];
         }
 
+        if (($data['referral_source'] ?? '') !== '') $journeyDetails['How did you hear about us?'] = $data['referral_source'];
+
         return $base + $journeyDetails + [
             'Passengers' => 'Adults: ' . $data['adults'] . '; Children: ' . $data['children'] . '; Infants: ' . $data['infants'], 'Request Notes' => $data['notes'] !== '' ? $data['notes'] : 'None', 'Submitted At' => self::submittedAt(),
         ];

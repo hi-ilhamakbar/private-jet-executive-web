@@ -12,6 +12,7 @@ use App\Invoice\InvoicePdf;
 use App\Invoice\InvoiceRepository;
 use App\Invoice\InvoiceService;
 use App\Mail\InquiryMailer;
+use App\Mail\InvoiceMailer;
 use App\Core\Environment;
 use App\Security\AdminAuth;
 
@@ -75,6 +76,7 @@ require $projectRoot . '/app/Core/Environment.php';
 require $projectRoot . '/app/Forms/InquiryForms.php';
 require $projectRoot . '/app/Forms/InquiryReference.php';
 require $projectRoot . '/app/Mail/InquiryMailer.php';
+require $projectRoot . '/app/Mail/InvoiceMailer.php';
 require $projectRoot . '/app/Security/AdminAuth.php';
 require $projectRoot . '/app/Invoice/InvoiceData.php';
 require $projectRoot . '/app/Invoice/InvoiceRepository.php';
@@ -151,11 +153,12 @@ if ($formName !== null) {
     $captchaQuestion = InquiryForms::captcha($formName)['question'];
 }
 
-$adminState = ['authenticated' => false, 'errors' => [], 'notice' => null, 'values' => [], 'csrfToken' => '', 'invoices' => []];
+$adminState = ['authenticated' => false, 'errors' => [], 'notice' => null, 'values' => [], 'csrfToken' => '', 'invoices' => [], 'tab' => 'create', 'historyFilters' => []];
 if ($page === 'admin-invoices') {
     header('Cache-Control: no-store, private');
     AdminAuth::start();
     $adminState['authenticated'] = AdminAuth::isAuthenticated();
+    $adminState['tab'] = (string) ($_GET['tab'] ?? '') === 'history' ? 'history' : 'create';
 
     if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         $action = (string) ($_POST['admin_action'] ?? '');
@@ -187,6 +190,7 @@ if ($page === 'admin-invoices') {
                         $repository = new InvoiceRepository(Database::connect());
                         $invoice = (new InvoiceService($repository))->create($validated['values']);
                         $pdf = InvoicePdf::render($invoice);
+                        InvoiceMailer::send($invoice, $pdf);
                         header('Content-Type: application/pdf');
                         header('Content-Disposition: attachment; filename="' . str_replace(['#', '/'], ['', '-'], (string) $invoice['invoice_number']) . '.pdf"');
                         header('Content-Length: ' . strlen($pdf));
@@ -194,19 +198,34 @@ if ($page === 'admin-invoices') {
                         exit;
                     } catch (Throwable $exception) {
                         error_log('Invoice generation failed: ' . $exception->getMessage());
-                        $adminState['errors']['_form'] = 'The invoice could not be generated. Please verify the database and PDF configuration.';
+                        $adminState['errors']['_form'] = isset($invoice) ? 'The invoice was recorded, but the customer email could not be delivered. Please verify the SMTP configuration.' : 'The invoice could not be generated. Please verify the database and PDF configuration.';
                     }
                 }
             }
         }
     }
 
-    if ($adminState['authenticated']) {
+    if ($adminState['authenticated'] && $adminState['tab'] === 'history') {
         try {
-            $adminState['invoices'] = (new InvoiceRepository(Database::connect()))->latest();
+            $sort = (string) ($_GET['sort'] ?? 'generated_at');
+            $direction = (string) ($_GET['direction'] ?? 'desc');
+            $dateField = (string) ($_GET['date_field'] ?? 'generated_at');
+            $from = (string) ($_GET['from'] ?? '');
+            $to = (string) ($_GET['to'] ?? '');
+            $validDate = static fn (string $value): ?string => preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) === 1 ? $value : null;
+            $filters = [
+                'sort' => $sort === 'due_at' ? 'due_at' : 'generated_at',
+                'direction' => $direction === 'asc' ? 'asc' : 'desc',
+                'date_field' => $dateField === 'due_at' ? 'due_at' : 'generated_at',
+                'from' => $validDate($from),
+                'to' => $validDate($to),
+            ];
+            if ($filters['from'] !== null && $filters['to'] !== null && $filters['from'] > $filters['to']) throw new \RuntimeException('The date range is invalid.');
+            $adminState['historyFilters'] = $filters;
+            $adminState['invoices'] = (new InvoiceRepository(Database::connect()))->search($filters['sort'], $filters['direction'], $filters['date_field'], $filters['from'], $filters['to']);
         } catch (Throwable $exception) {
-            error_log('Invoice list failed: ' . $exception->getMessage());
-            $adminState['errors']['_form'] ??= 'Database connection is unavailable. Import the invoice migration and verify the database configuration.';
+            error_log('Invoice history failed: ' . $exception->getMessage());
+            $adminState['errors']['_form'] ??= 'Invoice history is unavailable. Verify the database configuration and date range.';
         }
     }
     $adminState['csrfToken'] = AdminAuth::csrfToken();
