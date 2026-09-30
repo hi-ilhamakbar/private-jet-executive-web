@@ -14,21 +14,6 @@ $today = date('Y-m-d');
 </section>
 
 <section class="section section--pearl">
-    <div class="container grid-two">
-        <div><p class="eyebrow eyebrow--dark">A considered alternative</p><h2>Travel arranged around you.</h2></div>
-        <div class="prose"><p>Private charter gives you greater control over timing, routing and the experience on the ground. Whether you are travelling for a family occasion, an important meeting or a discreet personal commitment, each request starts with a conversation about what matters most.</p><p>From our base in Indonesia, we coordinate charter requirements for journeys within the region and onward to destinations worldwide. Every itinerary remains subject to aircraft availability, applicable operational requirements and final confirmation.</p></div>
-    </div>
-</section>
-
-<section class="section">
-    <div class="container"><p class="eyebrow">What we consider</p><h2>Every detail has a purpose.</h2><div class="feature-grid">
-        <article class="feature-card"><h3>Route and timing</h3><p>Departure points, preferred schedules, airport access and the practicalities of your onward journey.</p></article>
-        <article class="feature-card"><h3>Aircraft suitability</h3><p>Options considered against passenger numbers, luggage, range, cabin needs and the nature of the journey.</p></article>
-        <article class="feature-card"><h3>Ground coordination</h3><p>Clear communication around the journey, with the discretion expected of private aviation.</p></article>
-    </div></div>
-</section>
-
-<section class="section section--pearl">
     <div class="container form-shell">
         <div class="form-shell__heading"><p class="eyebrow eyebrow--dark">Request a charter</p><h2>Plan your journey.</h2><p>Share the essential details below. This is an enquiry, not an aircraft or price confirmation.</p></div>
         <?php if ($formState['notice'] !== null): ?><p class="form-notice" role="status"><?= $escape($formState['notice']) ?></p><?php endif; ?>
@@ -55,4 +40,19 @@ $today = date('Y-m-d');
             <div class="form-submit"><p>By submitting, you agree that we may use your details to respond to this enquiry. Do not include payment information. A charter request is not a booking confirmation.</p><button class="button" type="submit">Request a charter</button></div>
         </form>
     </div>
+</section>
+
+<section class="section section--pearl">
+    <div class="container grid-two">
+        <div><p class="eyebrow eyebrow--dark">A considered alternative</p><h2>Travel arranged around you.</h2></div>
+        <div class="prose"><p>Private charter gives you greater control over timing, routing and the experience on the ground. Whether you are travelling for a family occasion, an important meeting or a discreet personal commitment, each request starts with a conversation about what matters most.</p><p>From our base in Indonesia, we coordinate charter requirements for journeys within the region and onward to destinations worldwide. Every itinerary remains subject to aircraft availability, applicable operational requirements and final confirmation.</p></div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container"><p class="eyebrow">What we consider</p><h2>Every detail has a purpose.</h2><div class="feature-grid">
+        <article class="feature-card"><h3>Route and timing</h3><p>Departure points, preferred schedules, airport access and the practicalities of your onward journey.</p></article>
+        <article class="feature-card"><h3>Aircraft suitability</h3><p>Options considered against passenger numbers, luggage, range, cabin needs and the nature of the journey.</p></article>
+        <article class="feature-card"><h3>Ground coordination</h3><p>Clear communication around the journey, with the discretion expected of private aviation.</p></article>
+    </div></div>
 </section>
