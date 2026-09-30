@@ -8,6 +8,7 @@ $metaDescription = $metaDescription ?? 'Private charter solutions from Indonesia
 $canonicalPath = $canonicalPath ?? '/';
 $appUrl = rtrim((string) (getenv('APP_URL') ?: 'https://privatejetexecutive.com'), '/');
 $canonicalUrl = $appUrl . ($canonicalPath === '/' ? '/' : $canonicalPath);
+$socialImageUrl = $appUrl . '/assets/images/hero-private-jet-sunrise.png';
 $structuredData = \App\Core\StructuredData::forPage($appUrl, $canonicalUrl, $canonicalPath, $pageTitle, $metaDescription);
 $isAdminPage = $canonicalPath === '/admin/invoices';
 ?>
@@ -25,7 +26,16 @@ $isAdminPage = $canonicalPath === '/admin/invoices';
     <meta property="og:title" content="<?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?> | <?= $siteName ?>">
     <meta property="og:description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
     <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
-    <meta name="twitter:card" content="summary">
+    <?php if (!$isAdminPage): ?>
+    <meta property="og:image" content="<?= htmlspecialchars($socialImageUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <meta property="og:image:secure_url" content="<?= htmlspecialchars($socialImageUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1916">
+    <meta property="og:image:height" content="821">
+    <meta property="og:image:alt" content="Private Jet Executive private jet at sunrise">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="<?= htmlspecialchars($socialImageUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
     <?php if (!$isAdminPage): ?><script type="application/ld+json"><?= json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script><?php endif; ?>
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?> | <?= $siteName ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">

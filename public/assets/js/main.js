@@ -334,13 +334,24 @@ document.querySelectorAll('[data-invoice-journey]').forEach((select) => {
   const form = select.closest('form');
   const returnField = form?.querySelector('[data-return-field]');
   const returnInput = returnField?.querySelector('input');
+  const outboundInput = form?.querySelector('[data-invoice-outbound]');
+  const inboundInput = form?.querySelector('[data-invoice-inbound]');
+  const updateInboundMinimum = () => {
+    if (!outboundInput || !inboundInput) return;
+    const minimum = outboundInput.value || outboundInput.min;
+    inboundInput.min = minimum;
+    if (inboundInput.value && inboundInput.value < minimum) inboundInput.value = '';
+  };
   const update = () => {
     const isReturn = select.value === 'return';
     returnField.hidden = !isReturn;
     returnInput.disabled = !isReturn;
     returnInput.required = isReturn;
+    updateInboundMinimum();
   };
   select.addEventListener('change', update);
+  outboundInput?.addEventListener('input', updateInboundMinimum);
+  outboundInput?.addEventListener('change', updateInboundMinimum);
   update();
 });
 
