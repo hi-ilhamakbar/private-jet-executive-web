@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Mail;
 
 use App\Core\Environment;
+use App\Invoice\InvoiceData;
 use PHPMailer\PHPMailer\PHPMailer;
 
 final class InvoiceMailer
@@ -41,9 +42,28 @@ final class InvoiceMailer
         $safeName = str_replace(['#', '/'], ['', '-'], $number) . '.pdf';
         $mail->Subject = 'Private Jet Executive Invoice ' . $number;
         $mail->isHTML(true);
-        $mail->Body = '<p>Dear ' . htmlspecialchars((string) $invoice['invoice_recipient'], ENT_QUOTES, 'UTF-8') . ',</p><p>Please find your Private Jet Executive invoice attached. Payment is due by the date stated on the invoice.</p><p>For payment questions, please reply to this email or contact <a href="mailto:charter@privatejetexecutive.com">charter@privatejetexecutive.com</a>.</p><p>Kind regards,<br>Private Jet Executive</p>';
-        $mail->AltBody = "Dear " . (string) $invoice['invoice_recipient'] . ",\n\nPlease find your Private Jet Executive invoice attached. Payment is due by the date stated on the invoice.\n\nFor payment questions, contact charter@privatejetexecutive.com.\n\nKind regards,\nPrivate Jet Executive";
+        $mail->Body = self::renderBody($invoice);
+        $mail->AltBody = self::plainBody($invoice);
         $mail->addStringAttachment($pdf, $safeName, PHPMailer::ENCODING_BASE64, 'application/pdf');
         $mail->send();
+    }
+
+    /** @param array<string, mixed> $invoice */
+    private static function renderBody(array $invoice): string
+    {
+        $projectRoot = dirname(__DIR__, 2);
+        $escape = static fn (mixed $value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+        $amount = InvoiceData::usd((int) $invoice['total_usd_cents']);
+        $dueAt = new \DateTimeImmutable((string) $invoice['due_at'], new \DateTimeZone('Asia/Jakarta'));
+        ob_start();
+        require $projectRoot . '/templates/emails/invoice.php';
+        return (string) ob_get_clean();
+    }
+
+    /** @param array<string, mixed> $invoice */
+    private static function plainBody(array $invoice): string
+    {
+        $dueAt = new \DateTimeImmutable((string) $invoice['due_at'], new \DateTimeZone('Asia/Jakarta'));
+        return "Dear " . (string) $invoice['invoice_recipient'] . ",\n\nPlease find your Private Jet Executive invoice attached.\n\nInvoice: " . (string) $invoice['invoice_number'] . "\nRoute: " . (string) $invoice['route'] . "\nTotal: " . InvoiceData::usd((int) $invoice['total_usd_cents']) . "\nPayment due: " . $dueAt->format('l, d F Y; H:i') . " WIB\n\nFor payment questions, please reply to charter@privatejetexecutive.com.\n\nKind regards,\nPrivate Jet Executive";
     }
 }
