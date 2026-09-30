@@ -30,9 +30,11 @@ final class InvoiceData
 
         $outbound = self::date($values['outbound_at']);
         if ($outbound === null) $errors['outbound_at'] = 'Enter the outbound flight date and time.';
+        $today = new \DateTimeImmutable('today', new \DateTimeZone('Asia/Jakarta'));
+        if ($outbound !== null && $outbound < $today) $errors['outbound_at'] = 'The outbound flight date must be today or later.';
         $return = self::date($values['return_at']);
         if ($values['journey_type'] === 'return' && $return === null) $errors['return_at'] = 'Enter the return flight date and time.';
-        if ($outbound !== null && $return !== null && $return < $outbound) $errors['return_at'] = 'The return flight must be after the outbound flight.';
+        if ($values['journey_type'] === 'return' && $outbound !== null && $return !== null && $return < $outbound) $errors['return_at'] = 'The inbound flight must be after the outbound flight.';
 
         $cents = self::toCents($values['total_amount']);
         if ($cents === null || $cents <= 0) $errors['total_amount'] = 'Enter a valid total amount in USD.';
