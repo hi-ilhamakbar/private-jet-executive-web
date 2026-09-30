@@ -43,6 +43,29 @@ final class AdminAuth
         return hash_equals(self::csrfToken(), $token);
     }
 
+    /**
+     * A single-use token prevents an accidental repeat POST from creating a
+     * second invoice after the first request has been accepted.
+     */
+    public static function invoiceRequestToken(): string
+    {
+        self::start();
+        $_SESSION['admin_invoice_request'] ??= bin2hex(random_bytes(32));
+        return (string) $_SESSION['admin_invoice_request'];
+    }
+
+    public static function consumeInvoiceRequestToken(string $token): bool
+    {
+        self::start();
+        $stored = (string) ($_SESSION['admin_invoice_request'] ?? '');
+        if ($stored === '' || !hash_equals($stored, $token)) {
+            return false;
+        }
+
+        unset($_SESSION['admin_invoice_request']);
+        return true;
+    }
+
     public static function attempt(string $username, string $password): bool
     {
         self::start();

@@ -343,3 +343,19 @@ document.querySelectorAll('[data-invoice-journey]').forEach((select) => {
   select.addEventListener('change', update);
   update();
 });
+
+document.querySelectorAll('[data-invoice-form]').forEach((form) => {
+  form.addEventListener('submit', (event) => {
+    if (form.dataset.submitting === 'true') {
+      event.preventDefault();
+      return;
+    }
+
+    form.dataset.submitting = 'true';
+    const button = form.querySelector('[data-invoice-submit]');
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Generating invoice…';
+    }
+  });
+});

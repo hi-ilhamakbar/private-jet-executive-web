@@ -153,7 +153,7 @@ if ($formName !== null) {
     $captchaQuestion = InquiryForms::captcha($formName)['question'];
 }
 
-$adminState = ['authenticated' => false, 'errors' => [], 'notice' => null, 'values' => [], 'csrfToken' => '', 'invoices' => [], 'tab' => 'create', 'historyFilters' => []];
+$adminState = ['authenticated' => false, 'errors' => [], 'notice' => null, 'values' => [], 'csrfToken' => '', 'invoiceRequestToken' => '', 'invoices' => [], 'tab' => 'create', 'historyFilters' => []];
 if ($page === 'admin-invoices') {
     header('Cache-Control: no-store, private');
     AdminAuth::start();
@@ -186,19 +186,23 @@ if ($page === 'admin-invoices') {
                 $adminState['values'] = $validated['values'];
                 $adminState['errors'] = $validated['errors'];
                 if ($validated['errors'] === []) {
-                    try {
-                        $repository = new InvoiceRepository(Database::connect());
-                        $invoice = (new InvoiceService($repository))->create($validated['values']);
-                        $pdf = InvoicePdf::render($invoice);
-                        InvoiceMailer::send($invoice, $pdf);
-                        header('Content-Type: application/pdf');
-                        header('Content-Disposition: attachment; filename="' . str_replace(['#', '/'], ['', '-'], (string) $invoice['invoice_number']) . '.pdf"');
-                        header('Content-Length: ' . strlen($pdf));
-                        echo $pdf;
-                        exit;
-                    } catch (Throwable $exception) {
-                        error_log('Invoice generation failed: ' . $exception->getMessage());
-                        $adminState['errors']['_form'] = isset($invoice) ? 'The invoice was recorded, but the customer email could not be delivered. Please verify the SMTP configuration.' : 'The invoice could not be generated. Please verify the database and PDF configuration.';
+                    if (!AdminAuth::consumeInvoiceRequestToken((string) ($_POST['invoice_request_token'] ?? ''))) {
+                        $adminState['errors']['_form'] = 'This invoice request has already been processed. Refresh the page before creating another invoice.';
+                    } else {
+                        try {
+                            $repository = new InvoiceRepository(Database::connect());
+                            $invoice = (new InvoiceService($repository))->create($validated['values']);
+                            $pdf = InvoicePdf::render($invoice);
+                            InvoiceMailer::send($invoice, $pdf);
+                            header('Content-Type: application/pdf');
+                            header('Content-Disposition: attachment; filename="' . str_replace(['#', '/'], ['', '-'], (string) $invoice['invoice_number']) . '.pdf"');
+                            header('Content-Length: ' . strlen($pdf));
+                            echo $pdf;
+                            exit;
+                        } catch (Throwable $exception) {
+                            error_log('Invoice generation failed: ' . $exception->getMessage());
+                            $adminState['errors']['_form'] = isset($invoice) ? 'The invoice was recorded, but the customer email could not be delivered. Please verify the SMTP configuration.' : 'The invoice could not be generated. Please verify the database and PDF configuration.';
+                        }
                     }
                 }
             }
@@ -229,6 +233,7 @@ if ($page === 'admin-invoices') {
         }
     }
     $adminState['csrfToken'] = AdminAuth::csrfToken();
+    $adminState['invoiceRequestToken'] = AdminAuth::invoiceRequestToken();
 }
 
 if ($page === 'not-found') {
