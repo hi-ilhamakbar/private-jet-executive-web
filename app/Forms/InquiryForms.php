@@ -266,7 +266,7 @@ final class InquiryForms
      */
     private static function oldValues(array $input): array
     {
-        $allowed = ['full_name', 'email', 'country_code', 'phone', 'journey_type', 'departure', 'arrival', 'departure_date', 'departure_time', 'return_date', 'return_time', 'adults', 'children', 'infants', 'notes', 'topic', 'subject', 'message'];
+        $allowed = ['full_name', 'email', 'country_code', 'phone', 'referral_source', 'journey_type', 'departure', 'arrival', 'departure_date', 'departure_time', 'return_date', 'return_time', 'adults', 'children', 'infants', 'notes', 'topic', 'subject', 'message'];
         $values = [];
 
         foreach ($allowed as $field) {

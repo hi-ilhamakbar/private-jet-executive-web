@@ -14,21 +14,6 @@ $today = date('Y-m-d');
 </section>
 
 <section class="section section--pearl">
-    <div class="container grid-two">
-        <div><p class="eyebrow eyebrow--dark">A considered alternative</p><h2>Travel arranged around you.</h2></div>
-        <div class="prose"><p>Private charter gives you greater control over timing, routing and the experience on the ground. Whether you are travelling for a family occasion, an important meeting or a discreet personal commitment, each request starts with a conversation about what matters most.</p><p>From our base in Indonesia, we coordinate charter requirements for journeys within the region and onward to destinations worldwide. Every itinerary remains subject to aircraft availability, applicable operational requirements and final confirmation.</p></div>
-    </div>
-</section>
-
-<section class="section">
-    <div class="container"><p class="eyebrow">What we consider</p><h2>Every detail has a purpose.</h2><div class="feature-grid">
-        <article class="feature-card"><h3>Route and timing</h3><p>Departure points, preferred schedules, airport access and the practicalities of your onward journey.</p></article>
-        <article class="feature-card"><h3>Aircraft suitability</h3><p>Options considered against passenger numbers, luggage, range, cabin needs and the nature of the journey.</p></article>
-        <article class="feature-card"><h3>Ground coordination</h3><p>Clear communication around the journey, with the discretion expected of private aviation.</p></article>
-    </div></div>
-</section>
-
-<section class="section section--pearl">
     <div class="container form-shell">
         <div class="form-shell__heading"><p class="eyebrow eyebrow--dark">Request a charter</p><h2>Plan your journey.</h2><p>Share the essential details below. This is an enquiry, not an aircraft or price confirmation.</p></div>
         <?php if ($formState['notice'] !== null): ?><p class="form-notice" role="status"><?= $escape($formState['notice']) ?></p><?php endif; ?>
@@ -46,6 +31,7 @@ $today = date('Y-m-d');
                 <div class="field <?= ($old['journey_type'] ?? '') !== 'return' ? 'field--disabled' : '' ?>" data-return-field aria-disabled="<?= ($old['journey_type'] ?? '') !== 'return' ? 'true' : 'false' ?>"><label id="return_time_label">Estimated return time <span aria-hidden="true">*</span></label><div class="time-picker" data-time-picker><input id="return_time" name="return_time" type="hidden" value="<?= $escape($old['return_time'] ?? '') ?>" data-time-value <?= ($old['journey_type'] ?? '') !== 'return' ? 'disabled' : '' ?>><button class="time-picker__trigger" type="button" aria-labelledby="return_time_label" aria-expanded="false" data-time-trigger <?= ($old['journey_type'] ?? '') !== 'return' ? 'disabled' : '' ?>>Select a time</button><div class="time-picker__panel" role="dialog" aria-label="Choose estimated return time" hidden data-time-panel><p>Select hour</p><div class="time-picker__hours" data-time-hours></div><p>Select minutes</p><div class="time-picker__minutes" data-time-minutes></div></div></div><?php if (isset($errors['return_time'])): ?><small class="field-error"><?= $escape($errors['return_time']) ?></small><?php endif; ?></div>
                 <div class="field field--full passenger-field"><span class="field-label">Passengers <span aria-hidden="true">*</span></span><div class="passenger-grid"><label for="adults">Adults <small>12+ years</small><input id="adults" name="adults" type="number" min="1" max="99" step="1" inputmode="numeric" required value="<?= $escape($old['adults'] ?? '1') ?>"></label><label for="children">Children <small>2–12 years</small><input id="children" name="children" type="number" min="0" max="99" step="1" inputmode="numeric" value="<?= $escape($old['children'] ?? '0') ?>"></label><label for="infants">Infants <small>Under 2 years</small><input id="infants" name="infants" type="number" min="0" max="99" step="1" inputmode="numeric" value="<?= $escape($old['infants'] ?? '0') ?>"></label></div><?php if (isset($errors['adults']) || isset($errors['children']) || isset($errors['infants'])): ?><small class="field-error"><?= $escape($errors['adults'] ?? $errors['children'] ?? $errors['infants']) ?></small><?php endif; ?></div>
                 <div class="field"><label for="charter_full_name">Full name <span aria-hidden="true">*</span></label><input id="charter_full_name" name="full_name" autocomplete="name" maxlength="120" required value="<?= $escape($old['full_name'] ?? '') ?>"><?php if (isset($errors['full_name'])): ?><small class="field-error"><?= $escape($errors['full_name']) ?></small><?php endif; ?></div>
+                <div class="field"><label for="referral_source">How did you hear about us? <span class="optional">Optional</span></label><select id="referral_source" name="referral_source"><option value="">-- Select --</option><?php foreach (['Wall Street Journal', 'New York Times', 'Forbes', 'CNBC', 'Google Search', 'Social Media', 'Event', 'Recommendation', 'Other'] as $source): ?><option value="<?= $escape($source) ?>" <?= ($old['referral_source'] ?? '') === $source ? 'selected' : '' ?>><?= $escape($source) ?></option><?php endforeach; ?></select></div>
                 <div class="field"><label for="charter_email">Email address <span aria-hidden="true">*</span></label><input id="charter_email" name="email" type="email" autocomplete="email" required value="<?= $escape($old['email'] ?? '') ?>"><?php if (isset($errors['email'])): ?><small class="field-error"><?= $escape($errors['email']) ?></small><?php endif; ?></div>
                 <div class="field field--phone"><label for="charter_country_code">Contact number <span aria-hidden="true">*</span></label><div class="phone-group"><select id="charter_country_code" name="country_code" required aria-label="Country calling code" data-country-picker><option value="">Country code</option><?php $selectedCountry = $old['country_code'] ?? ''; require dirname(__DIR__) . '/partials/country-options.php'; ?></select><input id="charter_phone" name="phone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel-national" placeholder="Phone number" required value="<?= $escape($old['phone'] ?? '') ?>"></div><?php if (isset($errors['country_code']) || isset($errors['phone'])): ?><small class="field-error"><?= $escape($errors['country_code'] ?? $errors['phone']) ?></small><?php endif; ?></div>
                 <div class="field field--full"><label for="notes">Request notes <span class="optional">Optional</span></label><textarea id="notes" name="notes" rows="5" maxlength="500" data-count-target="notes-count" placeholder="Passenger numbers, luggage, timing or other requirements."><?= $escape($old['notes'] ?? '') ?></textarea><div class="field-meta"><small id="notes-count">0 / 500</small><?php if (isset($errors['notes'])): ?><small class="field-error"><?= $escape($errors['notes']) ?></small><?php endif; ?></div></div>
@@ -54,4 +40,19 @@ $today = date('Y-m-d');
             <div class="form-submit"><p>By submitting, you agree that we may use your details to respond to this enquiry. Do not include payment information. A charter request is not a booking confirmation.</p><button class="button" type="submit">Request a charter</button></div>
         </form>
     </div>
+</section>
+
+<section class="section section--pearl">
+    <div class="container grid-two">
+        <div><p class="eyebrow eyebrow--dark">A considered alternative</p><h2>Travel arranged around you.</h2></div>
+        <div class="prose"><p>Private charter gives you greater control over timing, routing and the experience on the ground. Whether you are travelling for a family occasion, an important meeting or a discreet personal commitment, each request starts with a conversation about what matters most.</p><p>From our base in Indonesia, we coordinate charter requirements for journeys within the region and onward to destinations worldwide. Every itinerary remains subject to aircraft availability, applicable operational requirements and final confirmation.</p></div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container"><p class="eyebrow">What we consider</p><h2>Every detail has a purpose.</h2><div class="feature-grid">
+        <article class="feature-card"><h3>Route and timing</h3><p>Departure points, preferred schedules, airport access and the practicalities of your onward journey.</p></article>
+        <article class="feature-card"><h3>Aircraft suitability</h3><p>Options considered against passenger numbers, luggage, range, cabin needs and the nature of the journey.</p></article>
+        <article class="feature-card"><h3>Ground coordination</h3><p>Clear communication around the journey, with the discretion expected of private aviation.</p></article>
+    </div></div>
 </section>

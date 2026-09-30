@@ -9,6 +9,7 @@ $canonicalPath = $canonicalPath ?? '/';
 $appUrl = rtrim((string) (getenv('APP_URL') ?: 'https://privatejetexecutive.com'), '/');
 $canonicalUrl = $appUrl . ($canonicalPath === '/' ? '/' : $canonicalPath);
 $structuredData = \App\Core\StructuredData::forPage($appUrl, $canonicalUrl, $canonicalPath, $pageTitle, $metaDescription);
+$isAdminPage = $canonicalPath === '/admin/invoices';
 ?>
 <!doctype html>
 <html lang="en">
@@ -16,7 +17,7 @@ $structuredData = \App\Core\StructuredData::forPage($appUrl, $canonicalUrl, $can
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
-    <meta name="robots" content="index,follow">
+    <meta name="robots" content="<?= $isAdminPage ? 'noindex,nofollow,noarchive' : 'index,follow' ?>">
     <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
     <link rel="icon" href="/assets/images/favicon.ico" sizes="any">
     <meta property="og:type" content="website">
@@ -25,7 +26,7 @@ $structuredData = \App\Core\StructuredData::forPage($appUrl, $canonicalUrl, $can
     <meta property="og:description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8') ?>">
     <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
     <meta name="twitter:card" content="summary">
-    <script type="application/ld+json"><?= json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
+    <?php if (!$isAdminPage): ?><script type="application/ld+json"><?= json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script><?php endif; ?>
     <title><?= htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8') ?> | <?= $siteName ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
