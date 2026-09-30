@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS invoices (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     invoice_number VARCHAR(32) NOT NULL,
+    invoice_recipient VARCHAR(180) NOT NULL,
     journey_type ENUM('one_way', 'return') NOT NULL,
     route VARCHAR(180) NOT NULL,
     outbound_at DATETIME NOT NULL,

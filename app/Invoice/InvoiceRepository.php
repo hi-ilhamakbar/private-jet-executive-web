@@ -23,10 +23,11 @@ final class InvoiceRepository
     public function create(string $number, array $values, \DateTimeImmutable $generatedAt, \DateTimeImmutable $dueAt): array
     {
         $statement = $this->database->prepare(
-            'INSERT INTO invoices (invoice_number, journey_type, route, outbound_at, return_at, aircraft_type, capacity, additional_request, total_usd_cents, generated_at, due_at) VALUES (:invoice_number, :journey_type, :route, :outbound_at, :return_at, :aircraft_type, :capacity, :additional_request, :total_usd_cents, :generated_at, :due_at)'
+            'INSERT INTO invoices (invoice_number, invoice_recipient, journey_type, route, outbound_at, return_at, aircraft_type, capacity, additional_request, total_usd_cents, generated_at, due_at) VALUES (:invoice_number, :invoice_recipient, :journey_type, :route, :outbound_at, :return_at, :aircraft_type, :capacity, :additional_request, :total_usd_cents, :generated_at, :due_at)'
         );
         $statement->execute([
             'invoice_number' => $number,
+            'invoice_recipient' => $values['invoice_recipient'],
             'journey_type' => $values['journey_type'],
             'route' => $values['route'],
             'outbound_at' => $values['outbound_at'],
@@ -53,6 +54,6 @@ final class InvoiceRepository
     /** @return list<array<string, mixed>> */
     public function latest(int $limit = 12): array
     {
-        return $this->database->query('SELECT invoice_number, route, aircraft_type, total_usd_cents, generated_at FROM invoices ORDER BY id DESC LIMIT ' . max(1, min($limit, 50)))->fetchAll();
+        return $this->database->query('SELECT invoice_number, invoice_recipient, route, aircraft_type, total_usd_cents, due_at, generated_at FROM invoices ORDER BY id DESC LIMIT ' . max(1, min($limit, 50)))->fetchAll();
     }
 }

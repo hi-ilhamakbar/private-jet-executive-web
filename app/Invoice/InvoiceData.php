@@ -11,13 +11,14 @@ final class InvoiceData
      */
     public static function validate(array $input): array
     {
-        $fields = ['journey_type', 'route', 'outbound_at', 'return_at', 'aircraft_type', 'capacity', 'additional_request', 'total_amount'];
+        $fields = ['invoice_recipient', 'journey_type', 'route', 'outbound_at', 'return_at', 'aircraft_type', 'capacity', 'additional_request', 'total_amount'];
         $values = [];
         foreach ($fields as $field) {
             $values[$field] = trim((string) ($input[$field] ?? ''));
         }
 
         $errors = [];
+        if ($values['invoice_recipient'] === '' || mb_strlen($values['invoice_recipient']) > 180) $errors['invoice_recipient'] = 'Enter the invoice recipient (up to 180 characters).';
         if (!in_array($values['journey_type'], ['one_way', 'return'], true)) $errors['journey_type'] = 'Select a journey type.';
         if ($values['route'] === '' || mb_strlen($values['route']) > 180) $errors['route'] = 'Enter a route of up to 180 characters.';
         if ($values['aircraft_type'] === '' || mb_strlen($values['aircraft_type']) > 100) $errors['aircraft_type'] = 'Enter the aircraft type.';
