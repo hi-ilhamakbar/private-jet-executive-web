@@ -203,6 +203,7 @@ h2 { max-width: 14ch; font-size: clamp(2.6rem, 5vw, 4rem); }
 .payment-methods { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .75rem; }
 .payment-logo { display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 1.9rem; border: 1px solid rgb(248 247 244 / .25); border-radius: 2px; padding: .2rem .3rem; background: #fff; }
 .payment-logo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.payment-logo--transfer { color: var(--charcoal); font-size: .5rem; font-weight: 700; line-height: 1.05; text-align: center; letter-spacing: .04em; text-transform: uppercase; }
 .footer__connect { display: grid; align-content: start; gap: .5rem; font-size: .88rem; }
 .footer__links { display: grid; align-content: start; gap: .5rem; font-size: .88rem; }
 .footer__bottom { display: flex; justify-content: space-between; gap: 1rem; padding-block: 1.25rem; border-top: 1px solid rgb(248 247 244 / .12); color: var(--stone); font-size: .74rem; }
